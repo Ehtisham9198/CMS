@@ -14,9 +14,9 @@ app.use(cors());
 // For creating user
 app.post("/api/CreateUser", async(req,res)=>{
     try {
-        const {name,password, email} = req.body;
-        const query = 'INSERT INTO users(name,password,email) VALUES($1,$2,$3) RETURNING*'
-        const values = [name,password,email]
+        const {username,name,email,password} = req.body;
+        const query = 'INSERT INTO users(username, name,email,password) VALUES($1,$2,$3,$4) RETURNING*'
+        const values = [username,name,email,password]
         const result = await db.query(query,values);
         res.json({
             message: 'user added successfully',
@@ -69,24 +69,31 @@ app.post('/api/file_actions',async(req,res)=>{
 
 
 // for login
-app.post('/api/login',async(req,res)=>{
+app.post('/api/login',async(req,res):Promise<any>=>{
     try{
-    const {email,password} = req.body;
-    const query = `SELECT email FROM users where email=$1 and password= $2`
-    const values = [email,password];
-    const result = await db.query(query,values);
-    if(result)
-    {
-        console.log("Welcome")
+    const {username,password} = req.body;
+    const query = `SELECT email, password FROM users WHERE username = $1`;
+    const values = [username];
+    const result = await db.query(query, values);
+    const user = result.rows[0];
+    if(result.rows[0] && user.password === password){
+    // Successful login
+    res.json({
+        message: 'Logged in successfully',
+        user: { email: result.rows[0].email },
+        });
+        
     }else{
-        console.log("Credential error")
+        return res.status(401).json({ error: 'Invalid username or password' });
+        
     }
-}catch(error)
-{
-    console.log(error);
-}
-    
-})
+   
+     }catch (error) {
+      console.error('Error in login:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+  
 
 
 
