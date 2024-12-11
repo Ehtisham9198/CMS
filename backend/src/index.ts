@@ -86,6 +86,7 @@ app.post('/api/login',async(req,res):Promise<any>=>{
         message: 'Logged in successfully',
         user: { email: result.rows[0].email },
         });
+        console.log( result.rows[0].email )
         
     }else{
         return res.status(401).json({ error: 'Invalid username or password' });
