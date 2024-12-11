@@ -1,5 +1,6 @@
 import "dotenv/config"
 import express from "express";
+import cors from "cors";
 import db from "./configurations/db";
 
 const app = express();
@@ -7,17 +8,15 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use(cors());
 
-app.get('/', async (req, res) => {
-    const result = await db.query("SELECT * FROM Actions");
-    res.json(result.rows);
-});
 
+// For creating user
 app.post("/api/CreateUser", async(req,res)=>{
     try {
-        const {name, email} = req.body;
-        const query = 'INSERT INTO users(name,email) VALUES($1,$2) RETURNING*'
-        const values = [name,email]
+        const {name,password, email} = req.body;
+        const query = 'INSERT INTO users(name,password,email) VALUES($1,$2,$3) RETURNING*'
+        const values = [name,password,email]
         const result = await db.query(query,values);
         res.json({
             message: 'user added successfully',
@@ -29,6 +28,7 @@ app.post("/api/CreateUser", async(req,res)=>{
     }
 })
 
+// for initiate new file
 app.post('/api/initiate_file',async(req,res)=>{
     try{
     const {title,uploaded_by,file_path,} = req.body;
@@ -47,7 +47,8 @@ app.post('/api/initiate_file',async(req,res)=>{
     }
 })
 
-app.post('/api/file_actiona',async(req,res)=>{
+//  for file movement
+app.post('/api/file_actions',async(req,res)=>{
     try{
     const {file_id,from_user,to_user,action,remarks} = req.body;
     const query = `INSERT INTO Actions(file_id,from_user,to_user,action,remarks) VALUES ($1,$2,$3,$4,$5)`
@@ -65,6 +66,29 @@ app.post('/api/file_actiona',async(req,res)=>{
     }
 
 })
+
+
+// for login
+app.post('/api/login',async(req,res)=>{
+    try{
+    const {email,password} = req.body;
+    const query = `SELECT email FROM users where email=$1 and password= $2`
+    const values = [email,password];
+    const result = await db.query(query,values);
+    if(result)
+    {
+        console.log("Welcome")
+    }else{
+        console.log("Credential error")
+    }
+}catch(error)
+{
+    console.log(error);
+}
+    
+})
+
+
 
 async function main() {
     await db.connect();
