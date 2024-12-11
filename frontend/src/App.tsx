@@ -1,19 +1,24 @@
 import CreateFile from './pages/CreateFile.tsx'
-import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, Link, RouterProvider } from 'react-router-dom'
 import CreateUser from './pages/CreateUser.tsx';
+import Sidebar from './components/Sidebar.tsx';
 
 const router = createBrowserRouter(
   [
     {
       path: "/",
-      element: <Outlet/>,
+      element: <Link to="/dashboard">Dashboard</Link>
+    },
+    {
+      path: "/",
+      element: <Sidebar />,
       children: [
         {
-          index: true,
+          path: 'dashboard',
           element: <CreateUser/>
         },
         {
-          path: "file",
+          path: "files",
           element: <CreateFile/>,
         },
       ]
