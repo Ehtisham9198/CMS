@@ -99,33 +99,37 @@ app.post('/api/login',async(req,res):Promise<any>=>{
     }
   });
   
-app.post('/api/ChangePassword',async(req,res):Promise<any>=>{
-    try{
-    const {username,password,newpassword} = req.body;
-    const query = `SELECT password FROM users where username = $1`
-    const values = [username];
-    const result = await db.query(query,values);
-    const user = result.rows[0];
-    const isMatch = await bcrypt.compare(password,user.password);
-    if(isMatch)
-    {
-        const query1 =`UPDATE users SET password = $1 WHERE username = $2`
-        const values1 = [newpassword,username];
-        const result2 = await db.query(query1,values1)
-        console.log("Password changes successfully!")
-        res.json({
-            message:"Passowrd changed successfully"
-        })
-    }else{
-        return res.status(401).json({ error: 'Invalid username or password' });
-        
+//   change pass
+  app.post('/api/ChangePassword', async (req, res): Promise<any> => {
+    try {
+      const { username, password, newpassword } = req.body;
+      const query = `SELECT password FROM users WHERE username = $1`;
+      const values = [username];
+      const result = await db.query(query, values);
+  
+      if (!result.rows[0]) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+  
+      const user = result.rows[0];
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return res.status(401).json({ error: 'Invalid username or current password' });
+      }
+  
+      const hashedNewPassword = await bcrypt.hash(newpassword, 10);
+      const updateQuery = `UPDATE users SET password = $1 WHERE username = $2`;
+      const updateValues = [hashedNewPassword, username];
+      await db.query(updateQuery, updateValues);
+      res.json({
+        message: 'Password changed successfully',
+      });
+    } catch (error) {
+      console.error('Error in password change:', error);
+      res.status(500).json({ error: 'Internal server error' });
     }
-    }catch(error) {
-            console.error('Error in password changes:', error);
-            res.status(500).json({ error: 'Internal server error' });
-        }
-
-})
+  });
+  
 
 
 async function main() {
