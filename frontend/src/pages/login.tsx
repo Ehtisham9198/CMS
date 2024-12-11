@@ -4,10 +4,23 @@ import { useNavigate } from 'react-router-dom';
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [err, setErr] = useState('');
   const navigate = useNavigate();
+
+  function isValid() {
+    if(password.length < 6) {
+      setErr("password should be at least 6 characters long");
+      return false;
+    }
+
+    return true;
+  }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if(!isValid()) return;
+
     try {
       const response = await fetch('http://localhost:3000/api/login', {
         method: "POST",
@@ -24,6 +37,7 @@ const LoginPage = () => {
       } else {
         const errorData = await response.json();
         console.error('Login error:', errorData);
+        if(errorData.error) setErr(errorData.error);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -69,9 +83,12 @@ const LoginPage = () => {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                onBlur={isValid}
               />
             </div>
           </div>
+
+          {err && <p className='text-red-600'>{err}</p>}
 
           <div>
             <button
