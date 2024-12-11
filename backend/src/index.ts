@@ -2,6 +2,7 @@ import "dotenv/config"
 import express from "express";
 import cors from "cors";
 import db from "./configurations/db";
+import bcrypt from 'bcrypt';
 
 const app = express();
 
@@ -15,8 +16,10 @@ app.use(cors());
 app.post("/api/CreateUser", async(req,res)=>{
     try {
         const {username,name,email,password} = req.body;
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password,saltRounds);
         const query = 'INSERT INTO users(username, name,email,password) VALUES($1,$2,$3,$4) RETURNING*'
-        const values = [username,name,email,password]
+        const values = [username,name,email,hashedPassword]
         const result = await db.query(query,values);
         res.json({
             message: 'user added successfully',
@@ -76,7 +79,8 @@ app.post('/api/login',async(req,res):Promise<any>=>{
     const values = [username];
     const result = await db.query(query, values);
     const user = result.rows[0];
-    if(result.rows[0] && user.password === password){
+    const isMatch = await bcrypt.compare(password,user.password)
+    if(result.rows[0] && isMatch){
     // Successful login
     res.json({
         message: 'Logged in successfully',
