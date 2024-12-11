@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  
+  const navigate = useNavigate();
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
@@ -18,6 +20,7 @@ const LoginPage = () => {
       if (response.ok) {
         const data = await response.json();
         console.log('Login successful:', data);
+        navigate('/dashboard');
       } else {
         const errorData = await response.json();
         console.error('Login error:', errorData);
