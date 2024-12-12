@@ -10,18 +10,34 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use(cors());
-app.use(session({
-  name: 'session',
-  keys: ['very_secret_key'],
+app.use(cors({
+    credentials:true,
+    origin:"http://localhost:5173"
+}));
 
-  // Cookie Options
-  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+//adding cookies
+app.use(session({
+    name: 'session',
+    keys: ['very_secret_key'],
+    maxAge: 24 * 60 * 60 * 1000, 
+    httpOnly: true,
+    secure: false,  
+    sameSite: 'strict', 
 }));
 
 
-// TODO "coockie-session"
-// TODO "/api/auth/get-session"
+// check if the user is logged in
+app.get('/api/checksession', (req, res) => {
+    console.log(req.session); 
+    if (req.session && req.session.user) {
+        res.json({ loggedIn: true });
+    } else {
+        res.status(401).json({ loggedIn: false });
+    }
+});
+
+
+
 
 // For creating user
 app.post("/api/CreateUser", async (req, res) => {
@@ -89,13 +105,14 @@ app.post('/api/login', async (req, res): Promise<any> => {
         const user = result.rows[0];
 
         if (user?.password && await bcrypt.compare(password, user.password)) {
-            // Successful login
-            res.json({
+            if (req.session) {
+                req.session.user = { username: username }; 
+                console.log("Session set:", req.session.user);
+            }
+            return res.json({
                 message: 'Logged in successfully',
-                user: { email: result.rows[0].email },
+                user: { email: user.email },
             });
-            console.log(result.rows[0].email)
-
         } else {
             return res.status(401).json({ error: 'Invalid username or password' });
         }
@@ -104,8 +121,11 @@ app.post('/api/login', async (req, res): Promise<any> => {
         console.error('Error in login:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
-  });
-  
+});
+
+
+
+
 //   change pass
   app.post('/api/ChangePassword', async (req, res): Promise<any> => {
     try {
@@ -136,7 +156,15 @@ app.post('/api/login', async (req, res): Promise<any> => {
       res.status(500).json({ error: 'Internal server error' });
     }
   });
-  
+
+
+  //Logout
+  app.post('/api/logout', (req, res) => {
+    if (req.session) {
+        req.session = null; 
+    }
+    res.json({ message: 'Logged out successfully' });
+});
 
 
 async function main() {

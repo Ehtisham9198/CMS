@@ -8,8 +8,8 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   function isValid() {
-    if(password.length < 6) {
-      setErr("password should be at least 6 characters long");
+    if(password.length < 1) {
+      setErr("password should be at least 1 characters long");
       return false;
     }
 
@@ -28,6 +28,8 @@ const LoginPage = () => {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: 'include'
+  
       });
 
       if (response.ok) {
@@ -42,6 +44,10 @@ const LoginPage = () => {
     } catch (error) {
       console.error('Error:', error);
     }
+
+
+  
+  
   };
 
   return (
