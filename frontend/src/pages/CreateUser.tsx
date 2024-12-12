@@ -30,14 +30,12 @@ const CreateUser = () => {
       if(!isLoggedIn) navigate("/login?redirect=/dashboard");
       setIsLoggedIn(isLoggedIn);
     };
-  
+
     checkSession();
   }, []);
-  
 
   const SubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     const formData = new FormData(e.currentTarget);
     const name = formData.get('name');
     const email = formData.get('email');
@@ -53,20 +51,18 @@ const CreateUser = () => {
     console.log(response);
   };
 
-  // logout
   const logout = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/logout', {
+      await fetch('http://localhost:3000/api/logout', {
         method: "POST",
-        body: JSON.stringify({}),
         headers: {
           "Content-Type": "application/json",
         },
         credentials: "include",
       });
-      const data = await response.json();
-      console.log(data);
-      navigate('/');
+      setIsLoggedIn(false);
+      console.log("Logged Out")
+      navigate('/login');
     } catch (error) {
       console.error('Logout failed:', error);
     }
