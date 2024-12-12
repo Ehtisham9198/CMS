@@ -4,16 +4,15 @@ import { useNavigate } from 'react-router-dom';
 const CreateUser = () => {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true); // Tracks session-checking status
 
   useEffect(() => {
     const checkSession = async () => {
       try {
         const response = await fetch('http://localhost:3000/api/checksession', {
-          method:"GET",
-          credentials:'include'
+          method: "GET",
+          credentials: 'include',
         });
-        console.log(response, "poo");
-  
         if (response.ok) {
           setIsLoggedIn(true);
         } else {
@@ -22,16 +21,25 @@ const CreateUser = () => {
       } catch (error) {
         console.error('Error checking session:', error);
         setIsLoggedIn(false);
+      } finally {
+        setLoading(false);
       }
     };
-  
+
     checkSession();
   }, []);
-  
+
+  useEffect(() => {
+    if (!loading && !isLoggedIn) {
+      navigate('/login');
+    }
+    if (!loading && isLoggedIn) {
+      navigate('/dashboard');
+    }
+  }, [isLoggedIn, loading, navigate]);
 
   const SubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     const formData = new FormData(e.currentTarget);
     const name = formData.get('name');
     const email = formData.get('email');
@@ -43,30 +51,31 @@ const CreateUser = () => {
         "Content-Type": "application/json",
       },
     });
-    console.log(response);
+
+    if (response.ok) {
+      setIsLoggedIn(true); // Update state to reflect successful login
+    }
   };
 
-  // logout
   const logout = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/logout', {
+      await fetch('http://localhost:3000/api/logout', {
         method: "POST",
-        body: JSON.stringify({}),
         headers: {
           "Content-Type": "application/json",
         },
+        credentials:'include'
       });
-      const data = await response.json();
-      console.log(data);
-      navigate('/');
+      setIsLoggedIn(false);
+      console.log("Logged Out")
+      navigate('/login');
     } catch (error) {
       console.error('Logout failed:', error);
     }
   };
 
-  // If the user is not logged in, show a message or redirect them
-  if (!isLoggedIn) {
-    return <div>You must be logged in to access this page.</div>;
+  if (loading) {
+    return <div>Loading...</div>;
   }
 
   return (
