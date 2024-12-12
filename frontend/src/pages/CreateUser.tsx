@@ -7,22 +7,28 @@ const CreateUser = () => {
 
   useEffect(() => {
     const checkSession = async () => {
+      let isLoggedIn: boolean = true;
+
       try {
-        const response = await fetch('http://localhost:3000/api/checksession', {
-          method:"GET",
-          credentials:'include'
-        });
-        console.log(response, "poo");
+        const response = await fetch(
+          'http://localhost:3000/api/checksession',
+          { credentials:'include' }
+        );
   
         if (response.ok) {
-          setIsLoggedIn(true);
+          const data = await response.json();
+          isLoggedIn = !!data.loggedIn;
         } else {
-          setIsLoggedIn(false);
+          isLoggedIn = false;
         }
+
       } catch (error) {
         console.error('Error checking session:', error);
-        setIsLoggedIn(false);
+        isLoggedIn = false;
       }
+
+      if(!isLoggedIn) navigate("/login?redirect=/dashboard");
+      setIsLoggedIn(isLoggedIn);
     };
   
     checkSession();
@@ -43,6 +49,7 @@ const CreateUser = () => {
         "Content-Type": "application/json",
       },
     });
+
     console.log(response);
   };
 
@@ -55,6 +62,7 @@ const CreateUser = () => {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
       });
       const data = await response.json();
       console.log(data);
@@ -66,7 +74,7 @@ const CreateUser = () => {
 
   // If the user is not logged in, show a message or redirect them
   if (!isLoggedIn) {
-    return <div>You must be logged in to access this page.</div>;
+    return <h1>Loading...</h1>
   }
 
   return (

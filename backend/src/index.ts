@@ -36,9 +36,6 @@ app.get('/api/checksession', (req, res) => {
     }
 });
 
-
-
-
 // For creating user
 app.post("/api/CreateUser", async (req, res) => {
     try {
