@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 const CreateUser = () => {
   const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -28,7 +28,7 @@ const CreateUser = () => {
       }
 
       if(!isLoggedIn) navigate("/login?redirect=/dashboard");
-      setIsLoggedIn(isLoggedIn);
+      setIsLoading(false);
     };
 
     checkSession();
@@ -60,7 +60,7 @@ const CreateUser = () => {
         },
         credentials: "include",
       });
-      setIsLoggedIn(false);
+      setIsLoading(false);
       console.log("Logged Out")
       navigate('/login');
     } catch (error) {
@@ -69,7 +69,7 @@ const CreateUser = () => {
   };
 
   // If the user is not logged in, show a message or redirect them
-  if (!isLoggedIn) {
+  if (isLoading) {
     return <h1>Loading...</h1>
   }
 

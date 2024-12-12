@@ -4,6 +4,7 @@ import cors from "cors";
 import db from "./configurations/db";
 import bcrypt from 'bcrypt';
 import session from "cookie-session";
+import authRouter from "./routes/auth";
 
 const app = express();
 
@@ -24,6 +25,10 @@ app.use(session({
     secure: false,  
     sameSite: 'strict', 
 }));
+
+
+// Routes
+app.use("/api/auth", authRouter);
 
 
 // check if the user is logged in
