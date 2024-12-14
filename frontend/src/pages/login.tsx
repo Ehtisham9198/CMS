@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import React, { useContext, useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { sessionContext } from "../context/Session";
+import { login } from "../hooks/requests";
 
 const LoginPage = () => {
-  const [params, setParams] = useSearchParams();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [err, setErr] = useState('');
+  const [params] = useSearchParams();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [err, setErr] = useState("");
   const navigate = useNavigate();
 
+<<<<<<< HEAD
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -33,11 +36,33 @@ const LoginPage = () => {
       }
     } catch (error) {
       console.error('Error:', error);
+=======
+  const { session, revalidate } = useContext(sessionContext);
+  console.log({session});
+  
+  function isValid() {
+    if (password.length < 1) {
+      setErr("password should be at least 1 characters long");
+      return false;
     }
-
-
+    
+    return true;
+  }
   
-  
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!isValid()) return;
+    
+    const err = await login(username, password);
+    
+    if (err) {
+      setErr(err);
+    } else {
+      await revalidate();
+      if(document.location.pathname === "/login")
+        navigate(params.get("redirect") || "/dashboard");
+>>>>>>> a3ec00424928e314e2ed0f6dd0ad221bcf6c4afc
+    }
   };
 
   return (
@@ -84,7 +109,7 @@ const LoginPage = () => {
             </div>
           </div>
 
-          {err && <p className='text-red-600 text-sm'>{err}</p>}
+          {err && <p className="text-red-600 text-sm">{err}</p>}
 
           <div>
             <button
