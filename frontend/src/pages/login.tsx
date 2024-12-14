@@ -8,19 +8,8 @@ const LoginPage = () => {
   const [err, setErr] = useState('');
   const navigate = useNavigate();
 
-  function isValid() {
-    if(password.length < 1) {
-      setErr("password should be at least 1 characters long");
-      return false;
-    }
-
-    return true;
-  }
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    if(!isValid()) return;
 
     try {
       const response = await fetch('http://localhost:3000/api/login', {
@@ -90,7 +79,7 @@ const LoginPage = () => {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                onBlur={isValid}
+                
               />
             </div>
           </div>

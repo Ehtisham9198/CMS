@@ -6,6 +6,7 @@ import bcrypt from 'bcrypt';
 import session from "cookie-session";
 import authRouter from "./routes/auth";
 
+
 const app = express();
 
 const PORT = process.env.PORT || 3000;
@@ -44,11 +45,11 @@ app.get('/api/checksession', (req, res) => {
 // For creating user
 app.post("/api/CreateUser", async (req, res) => {
     try {
-        const { username, name, email, password } = req.body;
+        const { username, name, email, password,designation } = req.body;
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
-        const query = 'INSERT INTO users(username, name,email,password) VALUES($1,$2,$3,$4) RETURNING*'
-        const values = [username, name, email, hashedPassword]
+        const query = 'INSERT INTO users(username, name,email,password,designation) VALUES($1,$2,$3,$4,$5) RETURNING*'
+        const values = [username, name, email, hashedPassword,designation]
         const result = await db.query(query, values);
         res.json({
             message: 'user added successfully',
@@ -61,11 +62,11 @@ app.post("/api/CreateUser", async (req, res) => {
 })
 
 // for initiate new file
-app.post('/api/initiate_file', async (req, res) => {
+app.post('/api/initiate_file', async (req, res): Promise<any> => {
     try {
-        const { title, uploaded_by, file_path, } = req.body;
-        const query = 'INSERT INTO files(title,uploaded_by,file_path) VALUES ($1,$2,$3)'
-        const values = [title, uploaded_by, file_path]
+        const {id,title,uploaded_by} = req.body;
+        const query = 'INSERT INTO files(id,title,uploaded_by) VALUES ($1,$2,$3)'
+        const values = [id,title, uploaded_by]
         const result = await db.query(query, values);
         res.json({
             message: 'File initiated successfully',
@@ -105,7 +106,6 @@ app.post('/api/login', async (req, res): Promise<any> => {
         const values = [username];
         const result = await db.query(query, values);
         const user = result.rows[0];
-
         if (user?.password && await bcrypt.compare(password, user.password)) {
             if (req.session) {
                 req.session.user = { username: username }; 
@@ -167,6 +167,8 @@ app.post('/api/login', async (req, res): Promise<any> => {
     }
     res.json({ message: 'Logged out successfully' });
 });
+
+
 
 
 async function main() {

@@ -1,36 +1,57 @@
-import React from 'react'
+import React, { useState } from 'react';
 
 function CreateFile() {
-    const SubmitHandler= async(e: React.FormEvent<HTMLFormElement>)=>{
+    const [responseMessage, setResponseMessage] = useState('');
+
+    const SubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        const data = Object.fromEntries(new FormData(e.currentTarget).entries());
+        const formData = Object.fromEntries(new FormData(e.currentTarget).entries());
+        const data = {
+            ...formData,
+            file_path: formData.path
+        };
 
-        const response = await fetch('http://localhost:3000/api/initiate_file',{
-            method:"POST",
-            body: JSON.stringify(data),
-            headers: {
-                "Content-Type": "application/json",
-              },
-        });
-        console.log(response)
+        try {
+            const response = await fetch('http://localhost:3000/api/initiate_file', {
+                method: "POST",
+                body: JSON.stringify(data),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
 
-    }
-  return (
-    <div>
-      <form onSubmit={SubmitHandler}>
-        <label htmlFor="id">Enter id</label> <br />
-        <input name='uploaded_by' type="text" id='id' required /> <br />
-        <label htmlFor="file">Enter file</label> <br />
-        <textarea name='title'  id='email' required /> <br />
-        <label htmlFor="path">Enter path</label> <br />
-        <input name='file_path' type="text" id='path' required /> <br />
-        
-        <button>Create File</button>
-      </form>
-    </div>
-  )
+            const result = await response.json();
+            if (response.ok) {
+                setResponseMessage('File initiated successfully!');
+            } else {
+                setResponseMessage(result.error || 'Error initiating file');
+            }
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            setResponseMessage('An error occurred. Please try again.');
+        }
+    };
+
+    return (
+        <div>
+            <form onSubmit={SubmitHandler}>
+                <label htmlFor="id">Enter File id</label> <br />
+                <input type="text" name="id" required /><br />
+
+                <label htmlFor="Title">Enter the Title of file</label><br />
+                <input type="text" name="title" required /> <br />
+                <label htmlFor="uploaded_by">Enter your Username</label><br />
+                <input type="text" name="uploaded_by" required /> <br />
+                <br />
+                <br />
+
+                <button type="submit">Create File</button>
+            </form>
+
+            {responseMessage && <p>{responseMessage}</p>}
+        </div>
+    );
 }
 
-export default CreateFile
-
+export default CreateFile;
