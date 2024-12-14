@@ -28,6 +28,7 @@ app.use(session({
 }));
 
 
+
 // Routes
 app.use("/api/auth", authRouter);
 
@@ -61,10 +62,18 @@ app.post("/api/CreateUser", async (req, res) => {
     }
 })
 
+
+
 // for initiate new file
 app.post('/api/initiate_file', async (req, res): Promise<any> => {
     try {
-        const {id,title,uploaded_by} = req.body;
+        const {id,title} = req.body;
+        let uploaded_by
+        if (req.session && req.session.user) 
+            {
+                uploaded_by = req.session.user.username;
+            }
+        
         const query = 'INSERT INTO files(id,title,uploaded_by) VALUES ($1,$2,$3)'
         const values = [id,title, uploaded_by]
         const result = await db.query(query, values);
@@ -78,17 +87,73 @@ app.post('/api/initiate_file', async (req, res): Promise<any> => {
         res.status(500).json({ error: 'Error initiating file' });
     }
 })
+// get files for logged in user
+app.get('/api/get_files',async(req,res):Promise<any>=>{
+
+    try{
+    if (!(req.session && req.session.user)) {
+        return res.status(401).json({ error: 'Unauthorized access' });
+    }
+    const User = req.session.user.username;
+    const query = `SELECT id, title FROM files WHERE uploaded_by = $1`
+    const values = [User]
+    const result = await db.query(query,values);
+    console.log(result)
+    res.json({
+        massage: 'files are fetched',
+        fileData: result.rows
+    });
+}catch (error) {
+        console.error('Error in fetching files:', error);
+        res.status(500).json({ error: 'Error in fetching files' });
+    }
+
+
+})
+
+
+
 
 //  for file movement
-app.post('/api/file_actions', async (req, res) => {
+app.post('/api/file_actions', async (req, res):Promise<any> => {
     try {
-        const { file_id, from_user, to_user, action, remarks } = req.body;
-        const query = `INSERT INTO Actions(file_id,from_user,to_user,action,remarks) VALUES ($1,$2,$3,$4,$5)`
-        const values = [file_id, from_user, to_user, action, remarks]
+        let from_user;
+        if(req.session && req.session.user && req.session.user.username) {
+            from_user = req.session.user.username;
+        } else {
+            return res.status(400).json({ error: 'User not logged in' });
+        }
+
+        const query1 = `SELECT id, title FROM files WHERE uploaded_by = $1`;
+        const values1 = [from_user];
+        const result1 = await db.query(query1, values1);
+
+        if (!result1.rows || !result1.rows.length) {
+            return res.status(404).json({ error: 'No files found for the user' });
+        }
+
+        const { id, title } = result1.rows[0] || {};
+
+        // finding username related to desgnation in users table
+        const { to_users, action, remarks } = req.body;
+        console.log(req.body)
+
+        const query2 = `SELECT username FROM users WHERE designation = $1`
+        const values2 = [to_users]
+
+        const result2 = await db.query(query2,values2)
+        const to_username = result2.rows[0]
+        console.log(to_username,"lund");
+
+
+        const query = `INSERT INTO Actions(from_user, file_id, to_users, action, remarks, title) 
+                       VALUES ($1, $2, $3, $4, $5, $6)`;
+        const values = [from_user, id, to_username.username, action, remarks, title];
         const result = await db.query(query, values);
+
         res.json({
             message: 'File processed successfully',
-            fileData: result.rows[0]
+            fileData: result.rows[0] || {}
         });
     }
     catch (error) {

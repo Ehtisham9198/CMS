@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { sessionContext } from "../context/Session";
 import { login } from "../hooks/requests";
+import SignUp from "./SignUP";
 
 const LoginPage = () => {
   const [params] = useSearchParams();
