@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { sessionContext } from "../context/Session";
 import { login } from "../hooks/requests";
+import SignUp from "./SignUP";
 
 const LoginPage = () => {
   const [params] = useSearchParams();
@@ -10,33 +11,6 @@ const LoginPage = () => {
   const [err, setErr] = useState("");
   const navigate = useNavigate();
 
-<<<<<<< HEAD
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    try {
-      const response = await fetch('http://localhost:3000/api/login', {
-        method: "POST",
-        body: JSON.stringify({ username, password }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: 'include'
-  
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Login successful:', data);
-        navigate(params.get("redirect") || '/dashboard');
-      } else {
-        const errorData = await response.json();
-        console.error('Login error:', errorData);
-        if(errorData.error) setErr(errorData.error);
-      }
-    } catch (error) {
-      console.error('Error:', error);
-=======
   const { session, revalidate } = useContext(sessionContext);
   console.log({session});
   
@@ -61,7 +35,6 @@ const LoginPage = () => {
       await revalidate();
       if(document.location.pathname === "/login")
         navigate(params.get("redirect") || "/dashboard");
->>>>>>> a3ec00424928e314e2ed0f6dd0ad221bcf6c4afc
     }
   };
 

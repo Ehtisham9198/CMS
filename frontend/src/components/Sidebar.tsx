@@ -75,7 +75,7 @@ export default function Sidebar() {
 
           <SidebarLink href="/files">
             <GoFileDirectoryFill size={20} />
-            <span className="text-xs lg:text-base">Files</span>
+            <span className="text-xs lg:text-base">Initiate Files</span>
           </SidebarLink>
 
           <SidebarLink href="/users">
@@ -83,9 +83,9 @@ export default function Sidebar() {
             <span className="text-xs lg:text-base">Users</span>
           </SidebarLink>
 
-          <SidebarLink href="/testimonials">
+          <SidebarLink href="/createdFiles">
             {/* <AiFillFileText /> */}
-            <span className="text-xs lg:text-base">Testimonials</span>
+            <span className="text-xs lg:text-base">My Created Files</span>
           </SidebarLink>
         </ul>
       </div>

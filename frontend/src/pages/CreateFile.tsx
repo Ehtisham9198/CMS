@@ -19,6 +19,7 @@ function CreateFile() {
                 headers: {
                     "Content-Type": "application/json",
                 },
+                credentials:'include'
             });
 
             const result = await response.json();
@@ -41,8 +42,6 @@ function CreateFile() {
 
                 <label htmlFor="Title">Enter the Title of file</label><br />
                 <input type="text" name="title" required /> <br />
-                <label htmlFor="uploaded_by">Enter your Username</label><br />
-                <input type="text" name="uploaded_by" required /> <br />
                 <br />
                 <br />
 
