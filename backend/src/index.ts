@@ -91,7 +91,7 @@ app.get('/api/get_files',async(req,res):Promise<any>=>{
         return res.status(401).json({ error: 'Unauthorized access' });
     }
     const User = req.session.user.username;
-    const result = await db `SELECT id, title FROM files WHERE uploaded_by = ${User}`
+    const result = await db `SELECT* FROM actions WHERE from_user = ${User}`
     res.json({
         massage: 'files are fetched',
         fileData: result
@@ -116,41 +116,52 @@ app.post('/api/file_actions', async (req, res): Promise<any> => {
             return res.status(400).json({ error: 'User not logged in' });
         }
 
-     
-        // finding username related to designation in users table
-        const { id, to_users, action} = req.body;
-        const check = await db `SELECT COUNT(*) AS count FROM files WHERE id = ${id}`
-        if(check.length>0){
+        const { file_id :id,action, to_users: to_designation,  } = req.body;
+        console.log(req.body)
 
-        const result2 = await db`SELECT username FROM users WHERE designation = ${to_users}`;
-        const remarks = "No remarks"
-
-        const result1 = await db`SELECT title FROM files WHERE file_id = ${id}`;
-        if (!result1 || !result1.length) {
-            return res.status(404).json({ error: 'No files found for the user' });
+        // Validate that all necessary fields are provided
+        if (!id || !to_designation || !action) {
+            return res.status(400).json({ error: 'Missing required fields' });
         }
 
-        const { title } = result1[0] || {};
+        // Check if file exists
+        const check = await db`SELECT COUNT(*) AS count FROM files WHERE id = ${id}`;
+        if (!check || !check.length || check[0].count === 0) {
+            return res.status(404).json({ error: 'No files found for this id' });
+        }
 
+        // Fetch the username of the user with the specified designation
+        const result2 = await db`SELECT username FROM users WHERE designation = ${to_designation}`;
         if (!result2 || !result2.length) {
             return res.status(404).json({ error: 'No users found with the specified designation' });
         }
 
-        const to_username = result2[0]; // Assuming the first result is the correct one
+        const to_username = result2[0]; // Assuming the first result is valid
         console.log(to_username);
 
+        // Fetch file title
+        const result1 = await db`SELECT title FROM files WHERE id = ${id}`;
+        if (!result1 || !result1.length) {
+            return res.status(404).json({ error: 'No files found for the user' });
+        }
+
+        const { title } = result1[0]; // Assuming the first result contains the title
+
+        // Check if both to_username and title are defined
+        if (!to_username.username || !title) {
+            return res.status(400).json({ error: 'Invalid data found for the file' });
+        }
+
+        // Insert action into the database
+        const remarks = "No remarks";
         const result = await db`INSERT INTO Actions(from_user, file_id, to_users, action, remarks, title) 
-                       VALUES (${from_user}, ${id}, ${to_username.username}, ${action}, ${remarks}, ${title})`;
+                                VALUES (${from_user}, ${id}, ${to_username.username}, ${action}, ${remarks}, ${title})`;
 
         res.json({
             message: 'File processed successfully',
             fileData: result || {}
         });
-    }else{
-        return res.status(401).json({ error: 'Invalid Id' });
-    }
-    }
-    catch (error) {
+    } catch (error) {
         console.error('Error in processing file:', error);
         res.status(500).json({ error: 'Error in processing file' });
     }
@@ -163,7 +174,7 @@ app.get('/api/recievedFile',async(req,res)=>{
     if (req.session && req.session.user && req.session.user.username) {
         received = req.session.user.username;
     }
-    const result = await db `SELECT file_id,remarks,from_user,title,action FROM actions WHERE to_users =${received}`
+    const result = await db `SELECT id,file_id,from_user AS forwarded_by,title,action,created_at FROM actions WHERE to_users =${received}`
     res.json({
         message: 'File processed successfully',
         fileData: result || {}
@@ -173,11 +184,15 @@ app.get('/api/recievedFile',async(req,res)=>{
 // track status
 
 app.get('/api/track/:id',async(req,res)=>{
+    const file_id = req.params.id;
     
-    const result = await db `SELECT to_users FROM actions WHERE file_id = ${req.params.id}`
+    const result = await db `SELECT to_users FROM actions WHERE file_id = ${file_id}`
+    console.log(result)
     res.json({
         data:result
     })
+  
+
 })
 
 

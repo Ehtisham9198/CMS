@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { getFiles } from "../hooks/requests";
+
+
 import {
   Table,
   TableBody,
@@ -20,7 +21,7 @@ export interface IFile {
   updated_at?: string;
 }
 
-function Dashboard() {
+function Track() {
   const [files, setFiles] = useState<IFile[]>([]);
   const [filter, setFilter] = useState<string>("");
 
@@ -81,4 +82,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default Track;

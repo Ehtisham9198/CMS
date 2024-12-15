@@ -46,24 +46,25 @@ export async function login(username: string, password: string): Promise<string 
     }
 }
 
-export async function getFiles(): Promise<IFile[]> {
-    return [
-        { id: "cse/45", title: "Admission", created_by: "Rakesh", forwarded_by: "birju_op", created_at: "24 dec 2025" },
-        { id: "cse/22", title: "AK dash", created_by: "Ajaya", forwarded_by: "birju_op", created_at: "24 dec 2025" },
-        { id: "ce/20", title: "STudents", created_by: "Pradyut", forwarded_by: "birju_op", created_at: "24 dec 2025" },
-        { id: "it/69", title: "STudents", created_by: "Pradyut", forwarded_by: "birju_op", created_at: "24 dec 2025" },
-    ]
-}
+// export async function getFiles(): Promise<IFile[]> {
+//     return [
+//         { id: "cse/45", title: "Admission", created_by: "Rakesh", forwarded_by: "birju_op", created_at: "24 dec 2025" },
+//         { id: "cse/22", title: "AK dash", created_by: "Ajaya", forwarded_by: "birju_op", created_at: "24 dec 2025" },
+//         { id: "ce/20", title: "STudents", created_by: "Pradyut", forwarded_by: "birju_op", created_at: "24 dec 2025" },
+//         { id: "it/69", title: "STudents", created_by: "Pradyut", forwarded_by: "birju_op", created_at: "24 dec 2025" },
+//     ]
+// }
 
-// const getFiles = async () => {
-//     try {
-//         const response = await fetch("http://localhost:3000/api/recievedFile", {
-//             credentials: "include",
-//         });
-//         const data = await response.json();
-//         console.log(data);
-//         setFiles(data.fileData);
-//     } catch (error) {
-//         console.error("Error fetching files:", error);
-//     }
-// };
+export const getFiles = async (): Promise<IFile[]> => {
+    try {
+        const response = await fetch("http://localhost:3000/api/recievedFile", {
+            credentials: "include",
+        });
+        const data = await response.json();
+        console.log(data)
+        return data.fileData as IFile[]
+    } catch (error) {
+        console.error("Error fetching files:", error);
+        return [ ]
+    }
+};

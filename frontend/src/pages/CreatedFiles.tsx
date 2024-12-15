@@ -15,7 +15,6 @@ const CreatedFiles = () => {
   const [forwardTo, setForwardTo] = useState<string>("");
   const [openedFile, setOpenedFile] = useState<string>("");
 
-  console.log({files, action, forwardTo});
 
   useEffect(() => {
     const getFiles = async () => {
@@ -24,7 +23,6 @@ const CreatedFiles = () => {
           credentials: "include",
         });
         const data = await response.json();
-        console.log(data);
         setFiles(data.fileData);
       } catch (error) {
         console.error("Error fetching files:", error);
@@ -35,6 +33,12 @@ const CreatedFiles = () => {
 
   const ForwardFileHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+  
+    if (!id || !action || !forwardTo) {
+      console.error("All fields must be filled");
+      return;
+    }
+  
     try {
       const response = await fetch("http://localhost:3000/api/file_actions", {
         method: "POST",
@@ -42,24 +46,27 @@ const CreatedFiles = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          file_id:id,
+          file_id: id,
           action: action,
           to_users: forwardTo,
         }),
         credentials: "include",
       });
-
       const data = await response.json();
+      console.log("File action response:", data);
     } catch (error) {
       console.error("Error forwarding file:", error);
     }
   };
+  
+  
 
-  const Tracker=async(id: string)=>{
-    const resposnse = await fetch('http://localhost:3000/api/track/'+id);
+  const Tracker=async(file_id: string, action_id: string)=>{
+    const resposnse = await fetch('http://localhost:3000/api/track/'+file_id);
     const result =  await resposnse.json();
+    console.log(result.data)
     setTrack(result.data);
-    setOpenedFile(id);
+    setOpenedFile(action_id);
 
   }
 
@@ -69,8 +76,8 @@ const CreatedFiles = () => {
       <ul>
         {files.map((file) => (
           <li key={file.id}>
-            ID: {file.id}, Title: {file.title}
-            <button onClick={() => Tracker(file.id)} className=" ml-3 mt-2 px-1 py-0.5 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400">Track</button>
+            ID: {file.file_id}, Title: {file.title},
+            <button onClick={() => Tracker(file.file_id, file.id)} className=" ml-3 mt-2 px-1 py-0.5 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400">Track</button>
             {openedFile === file.id && <h1>{JSON.stringify(track)}</h1>}
           </li>
         ))}
@@ -80,9 +87,9 @@ const CreatedFiles = () => {
 
       <br />
       <form onSubmit={ForwardFileHandler}>
-        <label htmlFor="id">Enter Id</label>
+        <label htmlFor="id">Enter Id</label> <br />
+        <input type="text" name="id" value={id} onChange={(e) => setId(e.target.value)} />
         <br />
-        <input type="text" value={id}onChange={(e) => setId(e.target.value)} />
         <label htmlFor="action">Action</label>
         <br />
         <select
