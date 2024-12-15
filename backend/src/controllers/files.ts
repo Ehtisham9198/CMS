@@ -11,7 +11,7 @@ export const getTrack = async (req: Request, res: Response): Promise<any> => {
     }
 
     try {
-        const result = await db`SELECT to_users, from_user, remarks, created_at 
+        const result = await db`SELECT id, to_users, from_user, remarks, created_at 
                                 FROM actions 
                                 WHERE file_id = ${file_id} 
                                 ORDER BY created_at`;
