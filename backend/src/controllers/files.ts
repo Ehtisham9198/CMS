@@ -11,7 +11,7 @@ export const getTrack = async (req: Request, res: Response): Promise<any> => {
     }
 
     try {
-        const result = await db`SELECT id, to_users, from_user, remarks, created_at 
+        const result = await db`SELECT id, to_users as to_user, from_user, remarks, created_at 
                                 FROM actions 
                                 WHERE file_id = ${file_id} 
                                 ORDER BY created_at`;
@@ -32,19 +32,19 @@ export const getTrack = async (req: Request, res: Response): Promise<any> => {
 };
 
 // get files for logged in user
-export const getFiles =async(req:Request,res:Response):Promise<any>=>{
+export const getFiles = async (req: Request, res: Response): Promise<any> => {
 
-    try{
-    if (!(req.session && req.session.user)) {
-        return res.status(401).json({ error: 'Unauthorized access' });
-    }
-    const User = req.session.user.username;
-    const result = await db `SELECT* FROM files WHERE from_user = ${User}`
-    res.json({
-        massage: 'files are fetched',
-        fileData: result
-    });
-}catch (error) {
+    try {
+        if (!(req.session && req.session.user)) {
+            return res.status(401).json({ error: 'Unauthorized access' });
+        }
+        const User = req.session.user.username;
+        const result = await db`SELECT* FROM files WHERE from_user = ${User}`
+        res.json({
+            massage: 'files are fetched',
+            fileData: result
+        });
+    } catch (error) {
         console.error('Error in fetching files:', error);
         res.status(500).json({ error: 'Error in fetching files' });
     }
@@ -52,15 +52,30 @@ export const getFiles =async(req:Request,res:Response):Promise<any>=>{
 
 };
 
+// get file by id
+export const getFile = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const file_id = req.params.id as string;
+        const result = await db`SELECT* FROM files WHERE id = ${file_id}`
+        res.json({
+            success: true,
+            data: result,
+        });
+    } catch (error) {
+        console.error('Error in fetching files:', error);
+        res.status(500).json({ error: 'Error in fetching files' });
+    }
+};
+
 
 
 // for fetch recieved files
-export const getRecievedFiles=async(req:Request,res:Response)=>{
+export const getRecievedFiles = async (req: Request, res: Response) => {
     let received;
     if (req.session && req.session.user && req.session.user.username) {
         received = req.session.user.username;
     }
-    const result = await db `SELECT id,uploaded_by,title,created_at FROM files WHERE uploaded_by =${received}`
+    const result = await db`SELECT id,uploaded_by,title,created_at FROM files WHERE uploaded_by =${received}`
     res.json({
         message: 'File processed successfully',
         fileData: result || {}
@@ -69,7 +84,7 @@ export const getRecievedFiles=async(req:Request,res:Response)=>{
 
 
 // Get actions
-export const getActions= async (req:Request, res:Response): Promise<any> => {
+export const getActions = async (req: Request, res: Response): Promise<any> => {
     try {
         let from_user;
         if (req.session && req.session.user && req.session.user.username) {
@@ -78,7 +93,7 @@ export const getActions= async (req:Request, res:Response): Promise<any> => {
             return res.status(400).json({ error: 'User not logged in' });
         }
 
-        const { file_id :id,action, to_users: to_designation,  } = req.body;
+        const { file_id: id, action, to_users: to_designation, } = req.body;
         console.log(req.body)
 
         // Validate that all necessary fields are provided
@@ -131,17 +146,16 @@ export const getActions= async (req:Request, res:Response): Promise<any> => {
 
 
 // for initiate new file
-export const getInitiatedFiles= async (req:Request, res:Response): Promise<any> => {
+export const getInitiatedFiles = async (req: Request, res: Response): Promise<any> => {
     try {
-        const {id,title} = req.body;
+        const { id, title } = req.body;
         console.log(req.body)
         let uploaded_by
-        if (req.session && req.session.user) 
-            {
-                uploaded_by = req.session.user.username;
-            }
-        
-        const result = await db `INSERT INTO files (id,title,uploaded_by) VALUES ( ${id}, ${title},${uploaded_by})`
+        if (req.session && req.session.user) {
+            uploaded_by = req.session.user.username;
+        }
+
+        const result = await db`INSERT INTO files (id,title,uploaded_by) VALUES ( ${id}, ${title},${uploaded_by})`
 
         res.json({
             message: 'File initiated successfully',

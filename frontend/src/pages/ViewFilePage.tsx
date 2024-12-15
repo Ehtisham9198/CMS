@@ -9,7 +9,7 @@ import {
 } from "../components/ui/table";
 import { IoEllipsisVertical } from "react-icons/io5";
 import { Input } from "../components/ui/input";
-import { getActions } from "../hooks/requests";
+import { getActions, getFile } from "../hooks/requests";
 import { useParams } from "react-router-dom";
 import { IFile } from "./Dashboard";
 
@@ -22,7 +22,7 @@ export interface IAction {
 }
 
 function ViewFilePage() {
-  const [file, setFile] = useState<IFile>();
+  const [file, setFile] = useState<IFile| null>(null);
   const [actions, setActions] = useState<IAction[]>([]);
   const { file_id } = useParams();
 
@@ -32,20 +32,18 @@ function ViewFilePage() {
 
   useEffect(() => {
     (async () => {
-      const files = await getActions(file_id);
-      setActions(files);
+      const actions = await getActions(file_id);
+      setActions(actions);
     })();
-    // (async () => {
-    //   const files = await getActions(file_id);
-    //   setActions(files);
-    // })();
+    (async () => {
+      const file = await getFile(file_id);
+      setFile(file);
+    })();
   }, []);
 
   return (
     <div className="sm:p-4 space-y-2">
-      <h1>{file_id}</h1>
-
-      <p>{JSON.stringify(actions)}</p>
+      <h1 className="text-3xl">{file?.id}: {file?.title}</h1>
 
       <div className="shadow">
         <Table className="bg-white">
@@ -59,7 +57,7 @@ function ViewFilePage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {actions.map((action, i) => (
+            {actions.map((action) => (
               <TableRow key={action.id}>
                 <TableCell>{action.created_at}</TableCell>
                 <TableCell>{action.from_user}</TableCell>

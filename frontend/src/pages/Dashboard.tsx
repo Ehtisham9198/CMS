@@ -18,7 +18,6 @@ export interface IFile {
   title: string;
   uploaded_by: string;
   created_at?: string;
-  updated_at?: string;
 }
 
 function Dashboard() {

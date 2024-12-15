@@ -54,11 +54,25 @@ export const getFiles = async (): Promise<IFile[]> => {
             credentials: "include",
         });
         const data = await response.json();
-        console.log(data)
+        // console.log(data)
         return data.fileData as IFile[]
     } catch (error) {
         console.error("Error fetching files:", error);
         return []
+    }
+};
+
+export const getFile = async (file_id: string): Promise<IFile | null> => {
+    try {
+        const response = await fetch(SERVER_URL + "/api/file/" + file_id, {
+            credentials: "include",
+        });
+        if (!response.ok) return null;
+        const data = await response.json();
+        return data.data[0] as IFile;
+    } catch (error) {
+        console.error("Error fetching files:", error);
+        return null;
     }
 };
 
@@ -70,7 +84,8 @@ export const getActions = async (file_id: string): Promise<IAction[]> => {
             return [];
         }
         const result = await resposnse.json();
-        return result;
+        // console.log("actions", result);
+        return result.data;
     } catch (error) {
         console.error(error);
         return [];
