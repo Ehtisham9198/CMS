@@ -122,21 +122,11 @@ app.post('/api/file_actions', async (req, res): Promise<any> => {
         }
 
         const { id, title } = result1[0] || {};
-        console.log('file_id:', id);
-        console.log('title:', title);
-
         // finding username related to designation in users table
         const { to_users, action} = req.body;
         const result2 = await db`SELECT username FROM users WHERE designation = ${to_users}`;
+        const remarks = "No remarks"
 
-         const remarks = "No remarks"
-        console.log('from_user:', from_user);
-        console.log('file_id:',id);
-        console.log('title:', title);
-        console.log('to_users:', to_users);
-        console.log('action:', action);
-        console.log('remarks:', remarks);
-       
 
         if (!result2 || !result2.length) {
             return res.status(404).json({ error: 'No users found with the specified designation' });
@@ -159,6 +149,28 @@ app.post('/api/file_actions', async (req, res): Promise<any> => {
     }
 });
 
+// for fetch recieved files
+
+app.get('/api/recievedFile',async(req,res)=>{
+    let received;
+    if (req.session && req.session.user && req.session.user.username) {
+        received = req.session.user.username;
+    }
+    const result = await db `SELECT file_id,remarks,from_user,title,action FROM actions WHERE to_users =${received}`
+    res.json({
+        message: 'File processed successfully',
+        fileData: result || {}
+    });
+})
+
+// track status
+
+app.get('/api/track/:id',async(req,res)=>{
+    const result = await db `SELECT to_users FROM actions WHERE file_id = ${req.params.id}`
+    res.json({
+        data:result
+    })
+})
 
 
 // for login

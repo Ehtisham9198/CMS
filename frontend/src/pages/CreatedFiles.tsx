@@ -4,12 +4,15 @@ import React, { useState, useEffect } from "react";
 type File = {
   id: string;
   title: string;
+
 };
 
 const CreatedFiles = () => {
   const [files, setFiles] = useState<File[]>([]);
+  const [track, setTrack] = useState<{to_user: string}[]>([]);
   const [action, setAction] = useState<string>("");
   const [forwardTo, setForwardTo] = useState<string>("");
+  const [openedFile, setOpenedFile] = useState<string>("");
 
   console.log({files, action, forwardTo});
 
@@ -50,6 +53,14 @@ const CreatedFiles = () => {
     }
   };
 
+  const Tracker=async(id: string)=>{
+    const resposnse = await fetch('http://localhost:3000/api/track/'+id);
+    const result =  await resposnse.json();
+    setTrack(result.data);
+    setOpenedFile(id);
+
+  }
+
   return (
     <div>
       <h1>Created Files</h1>
@@ -57,12 +68,15 @@ const CreatedFiles = () => {
         {files.map((file) => (
           <li key={file.id}>
             ID: {file.id}, Title: {file.title}
+            <button onClick={() => Tracker(file.id)} className=" ml-3 mt-2 px-1 py-0.5 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400">Track</button>
+            {openedFile === file.id && <h1>{JSON.stringify(track)}</h1>}
           </li>
         ))}
       </ul>
 
-      <br />
 
+
+      <br />
       <form onSubmit={ForwardFileHandler}>
         <label htmlFor="action">Action</label>
         <br />
