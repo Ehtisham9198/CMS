@@ -15,7 +15,7 @@ import { Link } from "react-router-dom";
 export interface IFile {
   id: string;
   title: string;
-  created_by: string;
+  uploaded_by: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -29,7 +29,7 @@ function Dashboard() {
     return files.filter(
       (file) =>
         file.title.toLowerCase().includes(q) ||
-        file.created_by.toLowerCase().includes(q) ||
+        file.uploaded_by.toLowerCase().includes(q) ||
         file.id.toLowerCase().includes(q)
     );
   }, [filter, files]);
@@ -55,18 +55,18 @@ function Dashboard() {
             <TableRow>
               <TableHead>File ID</TableHead>
               <TableHead>Title</TableHead>
-              <TableHead>Forwarded by</TableHead>
+              <TableHead>Initiated by</TableHead>
               <TableHead>Created on</TableHead>
               <TableHead>Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredList.map((file) => (
-              <Link to={"/files/"+file.id}>
+              // <Link to={"/files/"+file.id}>
                 <TableRow key={file.id}>
                   <TableCell>{file.id}</TableCell>
                   <TableCell className="line-clamp-1 h-9">{file.title}</TableCell>
-                  <TableCell>{file.created_by}</TableCell>
+                  <TableCell>{file.uploaded_by}</TableCell>
                   <TableCell>{file.created_at}</TableCell>
                   <TableCell>
                     <button>
@@ -74,7 +74,7 @@ function Dashboard() {
                     </button>
                   </TableCell>
                 </TableRow>
-              </Link>
+              // </Link>
             ))}
           </TableBody>
         </Table>

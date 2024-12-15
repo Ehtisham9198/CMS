@@ -83,26 +83,6 @@ app.post('/api/initiate_file', async (req, res): Promise<any> => {
         res.status(500).json({ error: 'Error initiating file' });
     }
 })
-// get files for logged in user
-app.get('/api/get_files',async(req,res):Promise<any>=>{
-
-    try{
-    if (!(req.session && req.session.user)) {
-        return res.status(401).json({ error: 'Unauthorized access' });
-    }
-    const User = req.session.user.username;
-    const result = await db `SELECT* FROM actions WHERE from_user = ${User}`
-    res.json({
-        massage: 'files are fetched',
-        fileData: result
-    });
-}catch (error) {
-        console.error('Error in fetching files:', error);
-        res.status(500).json({ error: 'Error in fetching files' });
-    }
-
-
-})
 
 
 
@@ -174,7 +154,7 @@ app.get('/api/recievedFile',async(req,res)=>{
     if (req.session && req.session.user && req.session.user.username) {
         received = req.session.user.username;
     }
-    const result = await db `SELECT id,file_id,from_user AS forwarded_by,title,action,created_at FROM actions WHERE to_users =${received}`
+    const result = await db `SELECT id,uploaded_by,title,created_at FROM files WHERE uploaded_by =${received}`
     res.json({
         message: 'File processed successfully',
         fileData: result || {}
@@ -186,7 +166,7 @@ app.get('/api/recievedFile',async(req,res)=>{
 app.get('/api/track/:id',async(req,res)=>{
     const file_id = req.params.id;
     
-    const result = await db `SELECT to_users FROM actions WHERE file_id = ${file_id}`
+    const result = await db `SELECT to_users, from_user, remarks,created_at FROM actions WHERE file_id = ${file_id} ORDER BY created_at`
     console.log(result)
     res.json({
         data:result
