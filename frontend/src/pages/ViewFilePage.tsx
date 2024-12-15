@@ -1,6 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
-
-
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -11,47 +9,37 @@ import {
 } from "../components/ui/table";
 import { IoEllipsisVertical } from "react-icons/io5";
 import { Input } from "../components/ui/input";
+import { getActions } from "../hooks/requests";
+import { useParams } from "react-router-dom";
 
-export interface IFile {
-  id:number,
-  file_id: string;
-  title: string;
-  forwarded_by: string;
-  created_at?: string;
-  updated_at?: string;
+export interface IAction {
+  to_user: string;
+  from_user: string;
+  remarks: string;
+  created_at: string;
 }
 
-function Track() {
-  const [files, setFiles] = useState<IFile[]>([]);
-  const [filter, setFilter] = useState<string>("");
+function ViewFilePage() {
+  const [actions, setActions] = useState<IAction[]>([]);
+  const { file_id } = useParams();
 
-  const filteredList = useMemo(() => {
-    const q = filter.toLowerCase();
-    return files.filter(
-      (file) =>
-        file.title.toLowerCase().includes(q) ||
-        file.forwarded_by.toLowerCase().includes(q) ||
-        file.file_id.toLowerCase().includes(q)
-    );
-  }, [filter, files]);
+  if(!file_id) {
+    return <h1>File not found.</h1>
+  }
 
   useEffect(() => {
     (async () => {
-      const files = await getFiles();
-      setFiles(files);
+      const files = await getActions(file_id);
+      setActions(files);
     })();
   }, []);
 
   return (
     <div className="sm:p-4 space-y-2">
-      <Input
-        className="w-72 sm:w-80 max-w-full shadow"
-        placeholder="search..."
-        onChange={(e) => setFilter(e.target.value)}
-      />
+      <h1>{JSON.stringify(file_id)}</h1>
 
       <div className="shadow">
-        <Table className="bg-white">
+        {/* <Table className="bg-white">
           <TableHeader className="bg-muted">
             <TableRow>
               <TableHead>File ID</TableHead>
@@ -76,10 +64,10 @@ function Track() {
               </TableRow>
             ))}
           </TableBody>
-        </Table>
+        </Table> */}
       </div>
     </div>
   );
 }
 
-export default Track;
+export default ViewFilePage;

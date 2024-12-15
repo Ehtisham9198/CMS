@@ -10,12 +10,12 @@ import {
 } from "../components/ui/table";
 import { IoEllipsisVertical } from "react-icons/io5";
 import { Input } from "../components/ui/input";
+import { Link } from "react-router-dom";
 
 export interface IFile {
-  id:number,
-  file_id: string;
+  id: string;
   title: string;
-  forwarded_by: string;
+  created_by: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -29,8 +29,8 @@ function Dashboard() {
     return files.filter(
       (file) =>
         file.title.toLowerCase().includes(q) ||
-        file.forwarded_by.toLowerCase().includes(q) ||
-        file.file_id.toLowerCase().includes(q)
+        file.created_by.toLowerCase().includes(q) ||
+        file.id.toLowerCase().includes(q)
     );
   }, [filter, files]);
 
@@ -62,17 +62,19 @@ function Dashboard() {
           </TableHeader>
           <TableBody>
             {filteredList.map((file) => (
-              <TableRow key={file.id}>
-                <TableCell>{file.file_id}</TableCell>
-                <TableCell className="line-clamp-1 h-9">{file.title}</TableCell>
-                <TableCell>{file.forwarded_by}</TableCell>
-                <TableCell>{file.created_at}</TableCell>
-                <TableCell>
-                  <button>
-                    <IoEllipsisVertical />
-                  </button>
-                </TableCell>
-              </TableRow>
+              <Link to={"/files/"+file.id}>
+                <TableRow key={file.id}>
+                  <TableCell>{file.id}</TableCell>
+                  <TableCell className="line-clamp-1 h-9">{file.title}</TableCell>
+                  <TableCell>{file.created_by}</TableCell>
+                  <TableCell>{file.created_at}</TableCell>
+                  <TableCell>
+                    <button>
+                      <IoEllipsisVertical />
+                    </button>
+                  </TableCell>
+                </TableRow>
+              </Link>
             ))}
           </TableBody>
         </Table>

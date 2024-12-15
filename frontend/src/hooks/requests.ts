@@ -65,6 +65,19 @@ export const getFiles = async (): Promise<IFile[]> => {
         return data.fileData as IFile[]
     } catch (error) {
         console.error("Error fetching files:", error);
-        return [ ]
+        return []
     }
 };
+
+export async function getActions(file_id: string) {
+    return [
+        { to_user: "Ajaya", from_user: "Pradyut", remarks: "No remarks", created_at: "2024-12-15T13:55:00.831Z" },
+        { to_user: "Pradyut", from_user: "Pradyut", remarks: "No remarks", created_at: "2024-12-15T13:55:45.611Z" },
+        { to_user: "Ajaya", from_user: "Pradyut", remarks: "No remarks", created_at: "2024-12-15T13:56:47.363Z" },
+        { to_user: "Pradyut", from_user: "Pradyut", remarks: "No remarks", created_at: "2024-12-15T14:32:33.132Z" },
+        { to_user: "Pradyut", from_user: "Pradyut", remarks: "No remarks", created_at: "2024-12-15T15:08:22.078Z" },
+        { to_user: "Pradyut", from_user: "Pradyut", remarks: "No remarks", created_at: "2024-12-15T15:08:35.169Z" },
+        { to_user: "Ajaya", from_user: "Pradyut", remarks: "No remarks", created_at: "2024-12-15T15:18:36.762Z" },
+        { to_user: "Ajaya", from_user: "Pradyut", remarks: "No remarks", created_at: "2024-12-15T15:20:28.226Z" }
+    ];
+}

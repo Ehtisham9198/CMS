@@ -13,6 +13,7 @@ import Dashboard from "./pages/Dashboard.tsx";
 import UsersPage from "./pages/Users.tsx";
 import CreatedFiles from './pages/CreatedFiles.tsx'
 import SignUp from "./pages/SignUP.tsx";
+import ViewFilePage from "./pages/ViewFilePage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -38,9 +39,7 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: (
-          <SessionProvider>
             <Sidebar />
-          </SessionProvider>
         ),
         children: [
           {
@@ -50,6 +49,10 @@ const router = createBrowserRouter([
           {
             path: "/files",
             element: <CreateFile />,
+          },
+          {
+            path: "/files/:file_id",
+            element: <ViewFilePage />,
           },
           {
             path: "/users",
