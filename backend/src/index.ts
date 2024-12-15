@@ -49,21 +49,19 @@ app.post("/api/CreateUser", async (req, res) => {
         const { username, name, email, password,designation } = req.body;
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
-        const query = 'INSERT INTO users(username, name,email,password,designation) VALUES($1,$2,$3,$4,$5) RETURNING*'
-        const values = [username, name, email, hashedPassword,designation]
-        const result = await db.query(query, values);
+        const result = await db`
+        INSERT INTO users (username, name, email, password, designation)
+        VALUES (${username}, ${name}, ${email}, ${hashedPassword}, ${designation})
+        RETURNING *`;
         res.json({
             message: 'user added successfully',
-            fileData: result.rows[0]
+            fileData: result[0]
         });
     } catch (error) {
         console.error('Error in creating a user:', error);
         res.status(500).json({ error: 'Error in creating user' });
     }
 })
-
-
-
 // for initiate new file
 app.post('/api/initiate_file', async (req, res): Promise<any> => {
     try {
@@ -74,12 +72,10 @@ app.post('/api/initiate_file', async (req, res): Promise<any> => {
                 uploaded_by = req.session.user.username;
             }
         
-        const query = 'INSERT INTO files(id,title,uploaded_by) VALUES ($1,$2,$3)'
-        const values = [id,title, uploaded_by]
-        const result = await db.query(query, values);
+        const result = await db `INSERT INTO files (id,title,uploaded_by) VALUES ( ${id}, ${title},${uploaded_by})`
         res.json({
             message: 'File initiated successfully',
-            fileData: result.rows[0]
+            fileData: result[0]
         });
     }
     catch (error) {
@@ -95,13 +91,10 @@ app.get('/api/get_files',async(req,res):Promise<any>=>{
         return res.status(401).json({ error: 'Unauthorized access' });
     }
     const User = req.session.user.username;
-    const query = `SELECT id, title FROM files WHERE uploaded_by = $1`
-    const values = [User]
-    const result = await db.query(query,values);
-    console.log(result)
+    const result = await db `SELECT id, title FROM files WHERE uploaded_by = ${User}`
     res.json({
         massage: 'files are fetched',
-        fileData: result.rows
+        fileData: result
     });
 }catch (error) {
         console.error('Error in fetching files:', error);
@@ -114,67 +107,70 @@ app.get('/api/get_files',async(req,res):Promise<any>=>{
 
 
 
-//  for file movement
-app.post('/api/file_actions', async (req, res):Promise<any> => {
+app.post('/api/file_actions', async (req, res): Promise<any> => {
     try {
         let from_user;
-        if(req.session && req.session.user && req.session.user.username) {
+        if (req.session && req.session.user && req.session.user.username) {
             from_user = req.session.user.username;
         } else {
             return res.status(400).json({ error: 'User not logged in' });
         }
 
-        const query1 = `SELECT id, title FROM files WHERE uploaded_by = $1`;
-        const values1 = [from_user];
-        const result1 = await db.query(query1, values1);
-
-        if (!result1.rows || !result1.rows.length) {
+        const result1 = await db`SELECT id, title FROM files WHERE uploaded_by = ${from_user}`;
+        if (!result1 || !result1.length) {
             return res.status(404).json({ error: 'No files found for the user' });
         }
 
-        const { id, title } = result1.rows[0] || {};
+        const { id, title } = result1[0] || {};
+        console.log('file_id:', id);
+        console.log('title:', title);
 
-        // finding username related to desgnation in users table
-        const { to_users, action, remarks } = req.body;
-        console.log(req.body)
+        // finding username related to designation in users table
+        const { to_users, action} = req.body;
+        const result2 = await db`SELECT username FROM users WHERE designation = ${to_users}`;
 
-        const query2 = `SELECT username FROM users WHERE designation = $1`
-        const values2 = [to_users]
+         const remarks = "No remarks"
+        console.log('from_user:', from_user);
+        console.log('file_id:',id);
+        console.log('title:', title);
+        console.log('to_users:', to_users);
+        console.log('action:', action);
+        console.log('remarks:', remarks);
+       
 
-        const result2 = await db.query(query2,values2)
-        const to_username = result2.rows[0]
-        console.log(to_username,"lund");
+        if (!result2 || !result2.length) {
+            return res.status(404).json({ error: 'No users found with the specified designation' });
+        }
 
+        const to_username = result2[0]; // Assuming the first result is the correct one
+        console.log(to_username);
 
-        const query = `INSERT INTO Actions(from_user, file_id, to_users, action, remarks, title) 
-                       VALUES ($1, $2, $3, $4, $5, $6)`;
-        const values = [from_user, id, to_username.username, action, remarks, title];
-        const result = await db.query(query, values);
+        const result = await db`INSERT INTO Actions(from_user, file_id, to_users, action, remarks, title) 
+                       VALUES (${from_user}, ${id}, ${to_username.username}, ${action}, ${remarks}, ${title})`;
 
         res.json({
             message: 'File processed successfully',
-            fileData: result.rows[0] || {}
+            fileData: result || {}
         });
     }
     catch (error) {
         console.error('Error in processing file:', error);
         res.status(500).json({ error: 'Error in processing file' });
     }
-})
+});
+
 
 
 // for login
 app.post('/api/login', async (req, res): Promise<any> => {
     try {
         const { username, password } = req.body;
-        const query = `SELECT email, password FROM users WHERE username = $1`;
-        const values = [username];
-        const result = await db.query(query, values);
-        const user = result.rows[0];
+        const result = await db `SELECT email, password FROM users WHERE username = ${username}`;
+ 
+        const user = result[0];
         if (user?.password && await bcrypt.compare(password, user.password)) {
             if (req.session) {
                 req.session.user = { username: username }; 
-                console.log("Session set:", req.session.user);
             }
             return res.json({
                 message: 'Logged in successfully',
@@ -197,24 +193,20 @@ app.post('/api/login', async (req, res): Promise<any> => {
   app.post('/api/ChangePassword', async (req, res): Promise<any> => {
     try {
       const { username, password, newpassword } = req.body;
-      const query = `SELECT password FROM users WHERE username = $1`;
-      const values = [username];
-      const result = await db.query(query, values);
+      const result = await db `SELECT password FROM users WHERE username = ${username}`;
   
-      if (!result.rows[0]) {
+      if (!result[0]) {
         return res.status(404).json({ error: 'User not found' });
       }
   
-      const user = result.rows[0];
+      const user = result[0];
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
         return res.status(401).json({ error: 'Invalid username or current password' });
       }
   
       const hashedNewPassword = await bcrypt.hash(newpassword, 10);
-      const updateQuery = `UPDATE users SET password = $1 WHERE username = $2`;
-      const updateValues = [hashedNewPassword, username];
-      await db.query(updateQuery, updateValues);
+      const updateQuery = `UPDATE users SET password = ${hashedNewPassword} WHERE username = ${username}`;
       res.json({
         message: 'Password changed successfully',
       });
@@ -237,7 +229,6 @@ app.post('/api/login', async (req, res): Promise<any> => {
 
 
 async function main() {
-    await db.connect();
 
     // Start the server
     app.listen(PORT, () => {

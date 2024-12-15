@@ -1,8 +1,9 @@
-import { Client } from 'pg';
+import postgres from 'postgres';
 
+const db = postgres(process.env.DATABASE_URL!, {
+    ssl: { rejectUnauthorized: false },
+    prepare: false
+});
 
-// PostgreSQL connection configuration
-// DATABASE_URL = "postgres://<username>:<password>@localhost:5432/<database_name>"
-const db = new Client(process.env.DATABASE_URL);
 
 export default db;
