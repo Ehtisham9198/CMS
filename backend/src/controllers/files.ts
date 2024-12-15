@@ -53,17 +53,6 @@ export const getFiles =async(req:Request,res:Response):Promise<any>=>{
 };
 
 
-// track status
-
-export const getTrackedFiles=async(req:Request,res:Response)=>{
-    const file_id = req.params.id;
-    const result = await db `SELECT id, to_users, from_user, remarks,created_at FROM actions WHERE file_id = ${file_id} ORDER BY created_at`
-    console.log(result)
-    res.json({
-        data:result
-    })
-}
-
 
 // for fetch recieved files
 export const getRecievedFiles=async(req:Request,res:Response)=>{
