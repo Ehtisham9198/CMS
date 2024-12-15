@@ -5,6 +5,7 @@ import db from "./configurations/db";
 import bcrypt from 'bcrypt';
 import session from "cookie-session";
 import authRouter from "./routes/auth";
+import fileRouter from "./routes/file";
 
 
 const app = express();
@@ -31,6 +32,7 @@ app.use(session({
 
 // Routes
 app.use("/api/auth", authRouter);
+app.use("/api", fileRouter);
 
 
 // check if the user is logged in

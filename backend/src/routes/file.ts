@@ -8,9 +8,5 @@ fileRouter.get('/get_files',getFiles);
 
 
 
-
-
-
-
 export default fileRouter;
 
