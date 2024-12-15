@@ -1,5 +1,5 @@
 import {Router} from "express";
-import { getActions, getFiles, getInitiatedFiles, getRecievedFiles, getTrack, getTrackedFiles } from "../controllers/files";
+import { getActions, getFiles, getInitiatedFiles, getRecievedFiles, getTrack } from "../controllers/files";
 const fileRouter = Router();
 
 
