@@ -4,17 +4,14 @@ import React, { useState, useEffect } from "react";
 type File = {
   id: string;
   title: string;
-
 };
 
 const CreatedFiles = () => {
   const [files, setFiles] = useState<File[]>([]);
-  const [track, setTrack] = useState<{to_user: string}[]>([]);
   const [action, setAction] = useState<string>("");
   const [id, setId] = useState<string>("");
   const [forwardTo, setForwardTo] = useState<string>("");
-  const [openedFile, setOpenedFile] = useState<string>("");
-
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const getFiles = async () => {
@@ -23,22 +20,31 @@ const CreatedFiles = () => {
           credentials: "include",
         });
         const data = await response.json();
-        setFiles(data.fileData);
+
+        if (data.fileData && Array.isArray(data.fileData)) {
+          setFiles(data.fileData);
+        } else {
+          setFiles([]);
+          console.error("Unexpected data structure:", data);
+        }
       } catch (error) {
         console.error("Error fetching files:", error);
+        setError("Failed to fetch files. Please try again later.");
       }
     };
+
     getFiles();
   }, []);
 
   const ForwardFileHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
+
     if (!id || !action || !forwardTo) {
       console.error("All fields must be filled");
+      setError("All fields must be filled before forwarding.");
       return;
     }
-  
+
     try {
       const response = await fetch("http://localhost:3000/api/file_actions", {
         method: "POST",
@@ -53,21 +59,47 @@ const CreatedFiles = () => {
         credentials: "include",
       });
       const data = await response.json();
-      console.log("File action response:", data);
+
+      if (response.ok) {
+        console.log("File action response:", data);
+        setError(null); 
+      } else {
+        console.error("Error forwarding file:", data);
+        setError(data.error || "Failed to forward file.");
+      }
     } catch (error) {
       console.error("Error forwarding file:", error);
+      setError("Error forwarding file. Please try again later.");
     }
   };
-  
-
 
   return (
     <div>
       <h1>Created Files</h1>
+
+      {error && <div style={{ color: "red" }}>{error}</div>}
+
+      {files.length > 0 ? (
+        <ul>
+          {files.map((file) => (
+            <li key={file.id}>
+              ID: {file.id}, Title: {file.title}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No files found.</p>
+      )}
+
       <br />
       <form onSubmit={ForwardFileHandler}>
         <label htmlFor="id">Enter Id</label> <br />
-        <input type="text" name="id" value={id} onChange={(e) => setId(e.target.value)} />
+        <input
+          type="text"
+          name="id"
+          value={id}
+          onChange={(e) => setId(e.target.value)}
+        />
         <br />
         <label htmlFor="action">Action</label>
         <br />
@@ -78,8 +110,8 @@ const CreatedFiles = () => {
           value={action}
           onChange={(e) => setAction(e.target.value)}
         >
-          <option value="forward">Select Option</option>
-          <option value="forward">forward</option>
+          <option value="">Select Option</option>
+          <option value="forward">Forward</option>
           <option value="reject">Reject</option>
         </select>
 
@@ -93,7 +125,7 @@ const CreatedFiles = () => {
           value={forwardTo}
           onChange={(e) => setForwardTo(e.target.value)}
         >
-          <option value="Dean A">Select Reciever</option>
+          <option value="">Select Receiver</option>
           <option value="Dean A">Dean A</option>
           <option value="Dean SA">Dean SA</option>
           <option value="HoD CSE">HoD CSE</option>
@@ -105,7 +137,9 @@ const CreatedFiles = () => {
 
         <br />
         <br />
-        <button className="px-2 py-1 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400">
+        <button
+          className="px-2 py-1 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        >
           Forward
         </button>
       </form>

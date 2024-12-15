@@ -39,7 +39,7 @@ export const getFiles =async(req:Request,res:Response):Promise<any>=>{
         return res.status(401).json({ error: 'Unauthorized access' });
     }
     const User = req.session.user.username;
-    const result = await db `SELECT* FROM files WHERE from_user = ${User}`
+    const result = await db `SELECT* FROM files WHERE uploaded_by = ${User}`
     res.json({
         massage: 'files are fetched',
         fileData: result
