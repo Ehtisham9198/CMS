@@ -1,49 +1,85 @@
-import React, { useEffect,useState } from "react";
-import { useSession } from "../context/Session";
+import { useEffect, useMemo, useState } from "react";
+import { getFiles } from "../hooks/requests";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../components/ui/table";
+import { IoEllipsisVertical } from "react-icons/io5";
+import { Input } from "../components/ui/input";
+
+export interface IFile {
+  id: string;
+  title: string;
+  forwarded_by: string;
+  created_by: string;
+  created_at?: string;
+  updated_at?: string;
+}
 
 function Dashboard() {
-  const session = useSession();
-  const [files, setFiles] = useState<File[]>([]);
+  const [files, setFiles] = useState<IFile[]>([]);
+  const [filter, setFilter] = useState<string>("");
 
-  type File = {
-    id: string;
-    title: string;
-    from_user: string;
-    action: string;
-    remarks: string;
-  };
+  const filteredList = useMemo(() => {
+    const q = filter.toLowerCase();
+    return files.filter(
+      (file) =>
+        file.title.toLowerCase().includes(q) ||
+        file.forwarded_by.toLowerCase().includes(q) ||
+        file.id.toLowerCase().includes(q) ||
+        file.created_by.toLowerCase().includes(q)
+    );
+  }, [filter, files]);
 
- useEffect(() => {
-    const getFiles = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/api/recievedFile", {
-          credentials: "include",
-        });
-        const data = await response.json();
-        console.log(data);
-        setFiles(data.fileData);
-      } catch (error) {
-        console.error("Error fetching files:", error);
-      }
-    };
-    getFiles();
+  useEffect(() => {
+    (async () => {
+      const files = await getFiles();
+      setFiles(files);
+    })();
   }, []);
 
   return (
-    <div>
-      <h1>Dashboard</h1>
-      <div>
-      <h1>Received Files</h1>
-      <ul>
-        {files.map((file) => (
-          <li key={file.id}>
-            ID: {file.id}, Title: {file.title}, Sender: {file.from_user},action by sender : {file.action}, Remarks :{file.remarks}
-          </li>
-        ))}
-      </ul>
+    <div className="sm:p-4 space-y-2">
+      <Input
+        className="w-72 sm:w-80 max-w-full shadow"
+        placeholder="search..."
+        onChange={(e) => setFilter(e.target.value)}
+      />
 
-      <br />
-    </div>
+      <div className="shadow">
+        <Table className="bg-white">
+          <TableHeader className="bg-muted">
+            <TableRow>
+              <TableHead>File ID</TableHead>
+              <TableHead>Title</TableHead>
+              <TableHead>Forwarded by</TableHead>
+              <TableHead>Created by</TableHead>
+              <TableHead>Created on</TableHead>
+              <TableHead>Action</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredList.map((file) => (
+              <TableRow key={file.id}>
+                <TableCell>{file.id}</TableCell>
+                <TableCell className="line-clamp-1 h-9">{file.title}</TableCell>
+                <TableCell>{file.forwarded_by}</TableCell>
+                <TableCell>{file.created_by}</TableCell>
+                <TableCell>{file.created_at}</TableCell>
+                <TableCell>
+                  <button>
+                    <IoEllipsisVertical />
+                  </button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }
