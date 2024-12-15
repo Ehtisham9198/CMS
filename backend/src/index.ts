@@ -2,7 +2,7 @@ import "dotenv/config"
 import express from "express";
 import cors from "cors";
 import authRouter from "./routes/auth";
-import fileRouter from "./routes/file";
+import fileRouter from "./routes/files";
 import session from "cookie-session";
 import userRouter from "./routes/user"
 

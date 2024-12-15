@@ -5,7 +5,7 @@ const userRounter = Router();
 
 
 userRounter.post("/CreateUser", getCreateUser);
-userRounter.get("/login", getLogin);
+userRounter.post("/login", getLogin);
 userRounter.post("/ChangePassword", getChangedPassward);
 userRounter.get("/logout", getLogout);
 
