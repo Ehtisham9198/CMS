@@ -1,12 +1,7 @@
 import { Request, Response } from "express";
-import { tryCatch } from "../lib/util";
 import bcrypt from 'bcrypt';
 import db from "../configurations/db";
 import session from "cookie-session";
-
-export const getSession = tryCatch((req, res) => {
-    res.json({session: req.session});
-});
 
 
 // For creating user
@@ -97,13 +92,4 @@ export const getLogout= (req:Request, res:Response) => {
 
 
 
-// check if the user is logged in
-export const getCheckedSession = (req:Request<{}, any, any, Record<string, any>>, res:Response) => {
-    console.log(req.session); 
-    if (req.session && req.session.user) {
-        res.json({ loggedIn: true });
-    } else {
-        res.status(401).json({ loggedIn: false });
-    }
-};
 
