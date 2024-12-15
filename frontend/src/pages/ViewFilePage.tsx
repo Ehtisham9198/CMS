@@ -11,8 +11,10 @@ import { IoEllipsisVertical } from "react-icons/io5";
 import { Input } from "../components/ui/input";
 import { getActions } from "../hooks/requests";
 import { useParams } from "react-router-dom";
+import { IFile } from "./Dashboard";
 
 export interface IAction {
+  id: string;
   to_user: string;
   from_user: string;
   remarks: string;
@@ -20,6 +22,7 @@ export interface IAction {
 }
 
 function ViewFilePage() {
+  const [file, setFile] = useState<IFile>();
   const [actions, setActions] = useState<IAction[]>([]);
   const { file_id } = useParams();
 
@@ -32,30 +35,36 @@ function ViewFilePage() {
       const files = await getActions(file_id);
       setActions(files);
     })();
+    // (async () => {
+    //   const files = await getActions(file_id);
+    //   setActions(files);
+    // })();
   }, []);
 
   return (
     <div className="sm:p-4 space-y-2">
-      <h1>{JSON.stringify(file_id)}</h1>
+      <h1>{file_id}</h1>
+
+      <p>{JSON.stringify(actions)}</p>
 
       <div className="shadow">
-        {/* <Table className="bg-white">
+        <Table className="bg-white">
           <TableHeader className="bg-muted">
             <TableRow>
-              <TableHead>File ID</TableHead>
-              <TableHead>Title</TableHead>
-              <TableHead>Forwarded by</TableHead>
-              <TableHead>Created on</TableHead>
-              <TableHead>Action</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Updated by</TableHead>
+              <TableHead>Remarks</TableHead>
+              <TableHead>Forwarded to</TableHead>
+              <TableHead>Attachments</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredList.map((file) => (
-              <TableRow key={file.id}>
-                <TableCell>{file.file_id}</TableCell>
-                <TableCell className="line-clamp-1 h-9">{file.title}</TableCell>
-                <TableCell>{file.forwarded_by}</TableCell>
-                <TableCell>{file.created_at}</TableCell>
+            {actions.map((action, i) => (
+              <TableRow key={action.id}>
+                <TableCell>{action.created_at}</TableCell>
+                <TableCell>{action.from_user}</TableCell>
+                <TableCell>{action.remarks}</TableCell>
+                <TableCell>{action.to_user}</TableCell>
                 <TableCell>
                   <button>
                     <IoEllipsisVertical />
@@ -64,7 +73,7 @@ function ViewFilePage() {
               </TableRow>
             ))}
           </TableBody>
-        </Table> */}
+        </Table>
       </div>
     </div>
   );

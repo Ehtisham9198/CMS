@@ -50,7 +50,7 @@ export async function login(username: string, password: string): Promise<string 
 
 export const getFiles = async (): Promise<IFile[]> => {
     try {
-        const response = await fetch("http://localhost:3000/api/recievedFile", {
+        const response = await fetch(SERVER_URL + "/api/recievedFile", {
             credentials: "include",
         });
         const data = await response.json();
@@ -58,13 +58,21 @@ export const getFiles = async (): Promise<IFile[]> => {
         return data.fileData as IFile[]
     } catch (error) {
         console.error("Error fetching files:", error);
-        return [ ]
+        return []
     }
 };
 
-
-export const getActions=async(file_id: string): Promise<IAction[]>=>{
-    const resposnse = await fetch('http://localhost:3000/api/track/'+file_id);
-    const result =  await resposnse.json();
-    return result;
+export const getActions = async (file_id: string): Promise<IAction[]> => {
+    try {
+        const resposnse = await fetch(SERVER_URL + '/api/track/' + file_id);
+        if (!resposnse.ok) {
+            console.log("error getting actions", resposnse);
+            return [];
+        }
+        const result = await resposnse.json();
+        return result;
+    } catch (error) {
+        console.error(error);
+        return [];
+    }
 }
