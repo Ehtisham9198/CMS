@@ -1,4 +1,5 @@
 import { IFile } from "../pages/Dashboard";
+import { IAction } from "../pages/ViewFilePage";
 
 export const SERVER_URL = import.meta.env.VITE_SERVER_URL || "http://localhost:3000";
 
@@ -60,3 +61,10 @@ export const getFiles = async (): Promise<IFile[]> => {
         return [ ]
     }
 };
+
+
+export const getActions=async(file_id: string): Promise<IAction[]>=>{
+    const resposnse = await fetch('http://localhost:3000/api/track/'+file_id);
+    const result =  await resposnse.json();
+    return result;
+}

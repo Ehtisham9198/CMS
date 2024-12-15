@@ -59,32 +59,11 @@ const CreatedFiles = () => {
     }
   };
   
-  
 
-  const Tracker=async(file_id: string, action_id: string)=>{
-    const resposnse = await fetch('http://localhost:3000/api/track/'+file_id);
-    const result =  await resposnse.json();
-    console.log(result.data)
-    setTrack(result.data);
-    setOpenedFile(action_id);
-
-  }
 
   return (
     <div>
       <h1>Created Files</h1>
-      <ul>
-        {files.map((file) => (
-          <li key={file.id}>
-            ID: {file.file_id}, Title: {file.title},
-            <button onClick={() => Tracker(file.file_id, file.id)} className=" ml-3 mt-2 px-1 py-0.5 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400">Track</button>
-            {openedFile === file.id && <h1>{JSON.stringify(track)}</h1>}
-          </li>
-        ))}
-      </ul>
-
-
-
       <br />
       <form onSubmit={ForwardFileHandler}>
         <label htmlFor="id">Enter Id</label> <br />
