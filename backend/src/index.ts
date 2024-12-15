@@ -116,17 +116,21 @@ app.post('/api/file_actions', async (req, res): Promise<any> => {
             return res.status(400).json({ error: 'User not logged in' });
         }
 
-        const result1 = await db`SELECT id, title FROM files WHERE uploaded_by = ${from_user}`;
+     
+        // finding username related to designation in users table
+        const { id, to_users, action} = req.body;
+        const check = await db `SELECT COUNT(*) AS count FROM files WHERE id = ${id}`
+        if(check.length>0){
+
+        const result2 = await db`SELECT username FROM users WHERE designation = ${to_users}`;
+        const remarks = "No remarks"
+
+        const result1 = await db`SELECT title FROM files WHERE file_id = ${id}`;
         if (!result1 || !result1.length) {
             return res.status(404).json({ error: 'No files found for the user' });
         }
 
-        const { id, title } = result1[0] || {};
-        // finding username related to designation in users table
-        const { to_users, action} = req.body;
-        const result2 = await db`SELECT username FROM users WHERE designation = ${to_users}`;
-        const remarks = "No remarks"
-
+        const { title } = result1[0] || {};
 
         if (!result2 || !result2.length) {
             return res.status(404).json({ error: 'No users found with the specified designation' });
@@ -142,6 +146,9 @@ app.post('/api/file_actions', async (req, res): Promise<any> => {
             message: 'File processed successfully',
             fileData: result || {}
         });
+    }else{
+        return res.status(401).json({ error: 'Invalid Id' });
+    }
     }
     catch (error) {
         console.error('Error in processing file:', error);
@@ -166,6 +173,7 @@ app.get('/api/recievedFile',async(req,res)=>{
 // track status
 
 app.get('/api/track/:id',async(req,res)=>{
+    
     const result = await db `SELECT to_users FROM actions WHERE file_id = ${req.params.id}`
     res.json({
         data:result

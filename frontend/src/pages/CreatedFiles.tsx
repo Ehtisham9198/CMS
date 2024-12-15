@@ -11,6 +11,7 @@ const CreatedFiles = () => {
   const [files, setFiles] = useState<File[]>([]);
   const [track, setTrack] = useState<{to_user: string}[]>([]);
   const [action, setAction] = useState<string>("");
+  const [id, setId] = useState<string>("");
   const [forwardTo, setForwardTo] = useState<string>("");
   const [openedFile, setOpenedFile] = useState<string>("");
 
@@ -41,6 +42,7 @@ const CreatedFiles = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          file_id:id,
           action: action,
           to_users: forwardTo,
         }),
@@ -78,6 +80,9 @@ const CreatedFiles = () => {
 
       <br />
       <form onSubmit={ForwardFileHandler}>
+        <label htmlFor="id">Enter Id</label>
+        <br />
+        <input type="text" value={id}onChange={(e) => setId(e.target.value)} />
         <label htmlFor="action">Action</label>
         <br />
         <select
