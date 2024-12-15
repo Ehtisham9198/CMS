@@ -51,7 +51,7 @@ const router = createBrowserRouter([
             element: <CreateFile />,
           },
           {
-            path: "/files/:file_id",
+            path: "/file/:file_id",
             element: <ViewFilePage />,
           },
           {

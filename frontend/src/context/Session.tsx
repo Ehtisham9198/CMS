@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { SERVER_URL } from "../hooks/requests";
 
 type User = {
   username: string;
@@ -18,10 +19,9 @@ function SessionProvider({ children }: { children: React.JSX.Element }) {
 
   async function getSession() {
     try {
-      const response = await fetch(
-        "http://localhost:3000/api/auth/get-session",
-        { credentials: "include" }
-      );
+      const response = await fetch(SERVER_URL + "/api/auth/get-session", {
+        credentials: "include",
+      });
 
       if (response.ok) {
         const data = await response.json();

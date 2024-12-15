@@ -11,6 +11,7 @@ import {
 import { IoEllipsisVertical } from "react-icons/io5";
 import { Input } from "../components/ui/input";
 import { Link } from "react-router-dom";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../components/ui/dropdown-menu";
 
 export interface IFile {
   id: string;
@@ -62,19 +63,24 @@ function Dashboard() {
           </TableHeader>
           <TableBody>
             {filteredList.map((file) => (
-              // <Link to={"/files/"+file.id}>
-                <TableRow key={file.id}>
-                  <TableCell>{file.id}</TableCell>
-                  <TableCell className="line-clamp-1 h-9">{file.title}</TableCell>
-                  <TableCell>{file.uploaded_by}</TableCell>
-                  <TableCell>{file.created_at}</TableCell>
-                  <TableCell>
-                    <button>
-                      <IoEllipsisVertical />
-                    </button>
-                  </TableCell>
-                </TableRow>
-              // </Link>
+              <TableRow key={file.id}>
+                <TableCell>{file.id}</TableCell>
+                <TableCell className="line-clamp-1 h-9">{file.title}</TableCell>
+                <TableCell>{file.uploaded_by}</TableCell>
+                <TableCell>{file.created_at}</TableCell>
+                <TableCell>
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="ml-auto mr-2">
+                    <IoEllipsisVertical />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem asChild>
+                      <Link to={"/file/"+file.id}>View</Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                </TableCell>
+              </TableRow>
             ))}
           </TableBody>
         </Table>
