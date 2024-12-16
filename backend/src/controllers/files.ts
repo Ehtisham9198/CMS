@@ -39,7 +39,14 @@ export const getFiles = async (req: Request, res: Response): Promise<any> => {
         return res.status(401).json({ error: 'Unauthorized access' });
     }
     const User = req.session.user.username;
-    const result = await db `SELECT* FROM files WHERE uploaded_by = ${User}`
+    const result = await db`
+    SELECT f.id, f.title 
+    FROM files f
+    LEFT JOIN actions a ON f.id = a.file_id
+    WHERE f.uploaded_by = ${User} AND a.file_id IS NULL;
+  `;
+  
+  
     res.json({
         massage: 'files are fetched',
         fileData: result
@@ -101,6 +108,7 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
             return res.status(400).json({ error: 'Missing required fields' });
         }
 
+
         // Check if file exists
         const check = await db`SELECT COUNT(*) AS count FROM files WHERE id = ${id}`;
         if (!check || !check.length || check[0].count === 0) {
@@ -112,9 +120,14 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
         if (!result2 || !result2.length) {
             return res.status(404).json({ error: 'No users found with the specified designation' });
         }
-
+        
         const to_username = result2[0]; // Assuming the first result is valid
         console.log(to_username);
+
+        if(to_username.username===from_user)
+        {
+            return res.status(404).json({ error: 'You can not send files to yourselves' });
+        }
 
         // Fetch file title
         const result1 = await db`SELECT title FROM files WHERE id = ${id}`;
@@ -134,7 +147,7 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
         const result = await db`INSERT INTO Actions(from_user, file_id, to_users, action, remarks, title) 
                                 VALUES (${from_user}, ${id}, ${to_username.username}, ${action}, ${remarks}, ${title})`;
 
-        res.json({
+        res.status(200).json({
             message: 'File processed successfully',
             fileData: result || {}
         });

@@ -70,7 +70,7 @@ export default function Sidebar() {
         <ul className="grid grid-cols-4 lg:flex lg:flex-col gap-1 p-2 lg:py-0 w-full lg:w-auto justify-around border lg:border-none">
           <SidebarLink href="/dashboard">
             <RiDashboardFill size={20} />
-            <span className="text-xs lg:text-base">Dashboard</span>
+            <span className="text-xs lg:text-base">My Initiated Files</span>
           </SidebarLink>
 
           <SidebarLink href="/files">
@@ -85,7 +85,7 @@ export default function Sidebar() {
 
           <SidebarLink href="/createdFiles">
             {/* <AiFillFileText /> */}
-            <span className="text-xs lg:text-base">My Created Files</span>
+            <span className="text-xs lg:text-base">My Drafted Files</span>
           </SidebarLink>
         </ul>
       </div>

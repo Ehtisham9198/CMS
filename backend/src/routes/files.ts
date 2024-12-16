@@ -8,7 +8,7 @@ fileRouter.get('/track/:id', getTrack);
 fileRouter.get('/get_files', getFiles);
 fileRouter.get('/file/:id', isAuthenticated, getFile);
 fileRouter.get('/recievedFile', getRecievedFiles);
-fileRouter.post('/file_actions', getActions);
+fileRouter.post('/file_forward', getActions);
 fileRouter.post('/initiate_file', getInitiatedFiles);
 
 
