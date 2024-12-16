@@ -1,4 +1,3 @@
-import { Forward } from "lucide-react";
 import React, { useState, useEffect } from "react";
 
 type File = {
@@ -6,7 +5,7 @@ type File = {
   title: string;
 };
 
-const CreatedFiles = () => {
+const ReceivedFiles = () => {
   const [files, setFiles] = useState<File[]>([]);
   const [action, setAction] = useState<string>("");
   const [id, setId] = useState<string>("");
@@ -152,4 +151,4 @@ const CreatedFiles = () => {
   );
 };
 
-export default CreatedFiles;
+export default ReceivedFiles;

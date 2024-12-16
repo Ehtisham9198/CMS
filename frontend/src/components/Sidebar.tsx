@@ -70,7 +70,7 @@ export default function Sidebar() {
         <ul className="grid grid-cols-4 lg:flex lg:flex-col gap-1 p-2 lg:py-0 w-full lg:w-auto justify-around border lg:border-none">
           <SidebarLink href="/dashboard">
             <RiDashboardFill size={20} />
-            <span className="text-xs lg:text-base">My Initiated Files</span>
+            <span className="text-xs lg:text-base">Dashboard</span>
           </SidebarLink>
 
           <SidebarLink href="/files">
