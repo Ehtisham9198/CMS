@@ -164,13 +164,13 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
       });
     }
     if (action === "reject") {
-      let previousUser = await db`
+      let previousUser = (await db`
             SELECT username
             FROM paths
             WHERE file_id = ${id}
             ORDER BY created_at DESC
             OFFSET 1
-            LIMIT 1`;
+            LIMIT 1`)[0]?.username;
 
       await db`DELETE FROM paths
             WHERE file_id = ${id}
@@ -180,10 +180,12 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
             WHERE file_id = ${id})`;
 
       if (!previousUser || previousUser.length === 0) {
-        previousUser = await db`
+        console.log(previousUser,"first")
+        previousUser = (await db`
             SELECT uploaded_by
             FROM files
-            WHERE file_id = ${id}`;
+            WHERE id = ${id}`)[0]?.uploaded_by;
+            console.log(previousUser[0].uploaded_by)
       }
 
       // Update the previous action to "Forwarded"
@@ -194,7 +196,7 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
       // Insert the new "Pending" action for the receiving user
       const result =
         await db`INSERT INTO actions(from_user, file_id, to_users, action, remarks, title) 
-                                    VALUES (${from_user}, ${id}, ${previousUser[0].username}, 'Pending', ${remarks}, ${title})`;
+                                    VALUES (${from_user}, ${id}, ${previousUser}, 'Pending', ${remarks}, ${title})`;
 
       return res.status(200).json({
         message: "File forwarded successfully",
