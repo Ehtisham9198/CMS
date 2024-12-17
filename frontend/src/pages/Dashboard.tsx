@@ -13,7 +13,12 @@ import {
 import { IoEllipsisVertical } from "react-icons/io5";
 import { Input } from "../components/ui/input";
 import { Link } from "react-router-dom";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../components/ui/dropdown-menu";
 
 export interface IFile {
   id: string;
@@ -43,13 +48,11 @@ function Dashboard() {
       setFiles(files);
     })();
   }, []);
-  console.log(files)
+  console.log(files);
 
-
-  const actionHandler = (id:string) => {
-    navigate(`/action`, { state: { id } }); 
+  const actionHandler = (id: string) => {
+    navigate(`/action`, { state: { id } });
   };
-  
 
   return (
     <div className="sm:p-4 space-y-2">
@@ -78,19 +81,23 @@ function Dashboard() {
                 <TableCell>{file.uploaded_by}</TableCell>
                 <TableCell>{file.created_at}</TableCell>
                 <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger className="ml-auto mr-2">
-                    <IoEllipsisVertical />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem asChild>
-                      <Link to={"/file/"+file.id}>View</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <button onClick={() => actionHandler(file.id)}>Take Action</button>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger className="ml-auto mr-2">
+                      <IoEllipsisVertical />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem asChild>
+                        <Link to={"/file/" + encodeURIComponent(file.id)}>
+                          View
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <button onClick={() => actionHandler(file.id)}>
+                          Take Action
+                        </button>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </TableCell>
               </TableRow>
             ))}
