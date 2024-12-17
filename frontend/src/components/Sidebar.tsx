@@ -85,7 +85,7 @@ export default function Sidebar() {
 
           <SidebarLink href="/createdFiles">
             {/* <AiFillFileText /> */}
-            <span className="text-xs lg:text-base">My Created Files</span>
+            <span className="text-xs lg:text-base">My Drafted Files</span>
           </SidebarLink>
         </ul>
       </div>

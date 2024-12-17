@@ -14,6 +14,7 @@ import UsersPage from "./pages/Users.tsx";
 import CreatedFiles from './pages/CreatedFiles.tsx'
 import SignUp from "./pages/SignUP.tsx";
 import ViewFilePage from "./pages/ViewFilePage.tsx";
+import Action from "./components/action.tsx";
 
 const router = createBrowserRouter([
   {
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <Link to="/dashboard">Dashboard</Link>,
+      },
+      {
+        path: "/action",
+        element: <Action/>,
       },
       {
         path: "/",

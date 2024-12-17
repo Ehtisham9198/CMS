@@ -39,7 +39,14 @@ export const getFiles = async (req: Request, res: Response): Promise<any> => {
         return res.status(401).json({ error: 'Unauthorized access' });
     }
     const User = req.session.user.username;
-    const result = await db `SELECT* FROM files WHERE uploaded_by = ${User}`
+    const result = await db`
+    SELECT f.id, f.title 
+    FROM files f
+    LEFT JOIN actions a ON f.id = a.file_id
+    WHERE f.uploaded_by = ${User} AND a.file_id IS NULL;
+  `;
+  
+  
     res.json({
         massage: 'files are fetched',
         fileData: result
@@ -69,13 +76,13 @@ export const getFile = async (req: Request, res: Response): Promise<any> => {
 
 
 
-// for fetch recieved files
-export const getRecievedFiles = async (req: Request, res: Response) => {
-    let received;
+// for fetch My initiated files
+export const getMyInitiatedFiles = async (req: Request, res: Response) => {
+    let my_name;
     if (req.session && req.session.user && req.session.user.username) {
-        received = req.session.user.username;
+        my_name = req.session.user.username;
     }
-    const result = await db`SELECT id,uploaded_by,title,created_at FROM files WHERE uploaded_by =${received}`
+    const result = await db`SELECT id,uploaded_by,title,created_at FROM files WHERE uploaded_by =${my_name}`
     res.json({
         message: 'File processed successfully',
         fileData: result || {}
@@ -83,9 +90,10 @@ export const getRecievedFiles = async (req: Request, res: Response) => {
 }
 
 
-// Get actions
 export const getActions = async (req: Request, res: Response): Promise<any> => {
     try {
+
+        // finding username
         let from_user;
         if (req.session && req.session.user && req.session.user.username) {
             from_user = req.session.user.username;
@@ -93,10 +101,8 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
             return res.status(400).json({ error: 'User not logged in' });
         }
 
-        const { file_id: id, action, to_users: to_designation, } = req.body;
-        console.log(req.body)
+        let { file_id: id, action, to_users: to_designation } = req.body;
 
-        // Validate that all necessary fields are provided
         if (!id || !to_designation || !action) {
             return res.status(400).json({ error: 'Missing required fields' });
         }
@@ -107,14 +113,16 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
             return res.status(404).json({ error: 'No files found for this id' });
         }
 
-        // Fetch the username of the user with the specified designation
+        // Fetching the username of the user with the specified designation
         const result2 = await db`SELECT username FROM users WHERE designation = ${to_designation}`;
         if (!result2 || !result2.length) {
             return res.status(404).json({ error: 'No users found with the specified designation' });
         }
 
-        const to_username = result2[0]; // Assuming the first result is valid
-        console.log(to_username);
+        const to_username = result2[0];
+        if (to_username.username === from_user) {
+            return res.status(400).json({ error: 'You cannot send files to yourself' });
+        }
 
         // Fetch file title
         const result1 = await db`SELECT title FROM files WHERE id = ${id}`;
@@ -122,19 +130,41 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
             return res.status(404).json({ error: 'No files found for the user' });
         }
 
-        const { title } = result1[0]; // Assuming the first result contains the title
+        const { title } = result1[0];
 
         // Check if both to_username and title are defined
         if (!to_username.username || !title) {
             return res.status(400).json({ error: 'Invalid data found for the file' });
         }
 
-        // Insert action into the database
+        // If the action is "forward," update the previous entry and create a new one
         const remarks = "No remarks";
-        const result = await db`INSERT INTO Actions(from_user, file_id, to_users, action, remarks, title) 
+
+        if (action === "forward") {
+            // Update the previous action to "Forwarded"
+            await db`UPDATE actions 
+                     SET action = 'Forwarded' 
+                     WHERE file_id = ${id} AND to_users = ${from_user}`;
+
+            // Insert the new "Pending" action for the receiving user
+            const result = await db`INSERT INTO actions(from_user, file_id, to_users, action, remarks, title) 
+                                    VALUES (${from_user}, ${id}, ${to_username.username}, 'Pending', ${remarks}, ${title})`;
+
+            return res.status(200).json({
+                message: 'File forwarded successfully',
+                fileData: result || {}
+            });
+        }
+
+        // Initial "Send" action
+        if (action === "Send") {
+            action = "Pending";
+        }
+
+        const result = await db`INSERT INTO actions(from_user, file_id, to_users, action, remarks, title) 
                                 VALUES (${from_user}, ${id}, ${to_username.username}, ${action}, ${remarks}, ${title})`;
 
-        res.json({
+        res.status(200).json({
             message: 'File processed successfully',
             fileData: result || {}
         });
@@ -145,8 +175,9 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
 };
 
 
+
 // for initiate new file
-export const getInitiatedFiles = async (req: Request, res: Response): Promise<any> => {
+export const getInitiateFiles = async (req: Request, res: Response): Promise<any> => {
     try {
         const { id, title } = req.body;
         console.log(req.body)
@@ -167,3 +198,38 @@ export const getInitiatedFiles = async (req: Request, res: Response): Promise<an
         res.status(500).json({ error: 'Error initiating file' });
     }
 }
+
+export const getReceivedFiles = async (req: Request, res: Response): Promise<any> => {
+    try {
+        let my_username;
+        if (req.session && req.session.user && req.session.user.username) {
+            my_username = req.session.user.username;
+        } else {
+            return res.status(400).json({ error: 'User not logged in' });
+        }
+
+        const actionState = "Pending";
+
+        // Fetch pending files for the current user
+        const result = await db`
+            SELECT files.id as id,files.title AS title,from_user AS forwarded_by,files.uploaded_by AS uploaded_by,files.created_at AS created_at
+            FROM actions JOIN files ON actions.file_id = files.id
+            WHERE actions.to_users = ${my_username} AND actions.action = ${actionState}
+        `;
+
+        if (!result || result.length === 0) {
+            return res.status(404).json({
+                message: 'No pending files found for the user',
+                fileData: []
+            });
+        }
+
+        res.status(200).json({
+            message: 'Files fetched successfully',
+            fileData: result
+        });
+    } catch (error) {
+        console.error('Error fetching received files:', error);
+        res.status(500).json({ error: 'Error fetching received files' });
+    }
+};

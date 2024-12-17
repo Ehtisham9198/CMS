@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { getFiles } from "../hooks/requests";
+import { useNavigate } from "react-router-dom";
+
 import {
   Table,
   TableBody,
@@ -28,6 +30,7 @@ export interface IFile {
 function Dashboard() {
   const [files, setFiles] = useState<IFile[]>([]);
   const [filter, setFilter] = useState<string>("");
+  const navigate = useNavigate();
 
   const filteredList = useMemo(() => {
     const q = filter.toLowerCase();
@@ -45,6 +48,13 @@ function Dashboard() {
       setFiles(files);
     })();
   }, []);
+  console.log(files)
+
+
+  const actionHandler = (id:string) => {
+    navigate(`/action`, { state: { id } }); 
+  };
+  
 
   return (
     <div className="sm:p-4 space-y-2">
@@ -83,7 +93,10 @@ function Dashboard() {
                           View
                         </Link>
                       </DropdownMenuItem>
-                    </DropdownMenuContent>
+                      <DropdownMenuItem asChild>
+                      <button onClick={() => actionHandler(file.id)}>Take Action</button>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
               </TableRow>

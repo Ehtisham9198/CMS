@@ -1,47 +1,29 @@
-import { Forward } from "lucide-react";
-import React, { useState, useEffect } from "react";
+import React, { useState} from "react";
+import { useLocation } from "react-router-dom";
 
-type File = {
-  id: string;
-  title: string;
-};
+interface LocationState {
+    id: string;
+  }
 
-const CreatedFiles = () => {
-  const [files, setFiles] = useState<File[]>([]);
+
+const Action = () => {
   const [action, setAction] = useState<string>("");
   const [id, setId] = useState<string>("");
   const [forwardTo, setForwardTo] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string>("");
 
-  useEffect(() => {
-    const getFiles = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/api/get_files", {
-          credentials: "include",
-        });
-        const data = await response.json();
+  const location = useLocation();
+  const state = location.state as LocationState; 
+  const fileId = state?.id;
+  console.log(fileId)
 
-        if (data.fileData && Array.isArray(data.fileData)) {
-          setFiles(data.fileData);
-        } else {
-          setFiles([]);
-          console.error("Unexpected data structure:", data);
-        }
-      } catch (error) {
-        console.error("Error fetching files:", error);
-        setError("Failed to fetch files. Please try again later.");
-      }
-    };
-
-    getFiles();
-  }, [files]);
 
   const ForwardFileHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!id || !action || !forwardTo) {
-      console.error("All fields must be filled");
+    if (!fileId || !action || !forwardTo) {
+      console.log("All fields must be filled", fileId, action, forwardTo);
       setError("All fields must be filled before forwarding.");
       return;
     }
@@ -53,13 +35,14 @@ const CreatedFiles = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          file_id: id,
+          file_id: fileId,
           action: action,
           to_users: forwardTo,
         }),
         credentials: "include",
       });
       const data = await response.json();
+      console.log(data)
 
       if (response.ok) {
         setError(null); 
@@ -76,32 +59,7 @@ const CreatedFiles = () => {
 
   return (
     <div>
-      <h1>Drafted Files</h1>
-
-      {error && <div style={{ color: "red" }}>{error}</div>}
-
-      {files.length > 0 ? (
-        <ul>
-          {files.map((file) => (
-            <li key={file.id}>
-              ID: {file.id}, Title: {file.title}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No files found.</p>
-      )}
-
-      <br />
-      <form onSubmit={ForwardFileHandler}>
-        <label htmlFor="id">Enter Id</label> <br />
-        <input
-          type="text"
-          name="id"
-          value={id}
-          onChange={(e) => setId(e.target.value)}
-        />
-        <br />
+      <form onSubmit={ForwardFileHandler}>       
         <label htmlFor="action">Action</label>
         <br />
         <select
@@ -112,7 +70,7 @@ const CreatedFiles = () => {
           onChange={(e) => setAction(e.target.value)}
         >
           <option value="">Select Option</option>
-          <option value="forward">Send</option>
+          <option value="forward">Forward</option>
         </select>
 
         <br />
@@ -152,4 +110,4 @@ const CreatedFiles = () => {
   );
 };
 
-export default CreatedFiles;
+export default Action;

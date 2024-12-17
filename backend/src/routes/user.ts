@@ -7,6 +7,6 @@ const userRounter = Router();
 userRounter.post("/CreateUser", getCreateUser);
 userRounter.post("/login", getLogin);
 userRounter.post("/ChangePassword", getChangedPassward);
-userRounter.get("/logout", getLogout);
+userRounter.post("/logout", getLogout);
 
 export default userRounter;

@@ -50,11 +50,11 @@ export async function login(username: string, password: string): Promise<string 
 
 export const getFiles = async (): Promise<IFile[]> => {
     try {
-        const response = await fetch(SERVER_URL + "/api/recievedFile", {
+        const response = await fetch(SERVER_URL + "/api/ReceivedFiles", {
             credentials: "include",
         });
         const data = await response.json();
-        // console.log(data)
+        console.log(data)
         return data.fileData as IFile[]
     } catch (error) {
         console.error("Error fetching files:", error);
