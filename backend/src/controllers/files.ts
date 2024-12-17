@@ -6,7 +6,7 @@ import { Request, Response } from "express";
 //  track files
 export const getTrack = async (req: Request, res: Response): Promise<any> => {
     const file_id = req.params.id;
-    if (!file_id || isNaN(Number(file_id))) {
+    if (!file_id) {
         return res.status(400).json({ error: 'Invalid file ID' });
     }
 
