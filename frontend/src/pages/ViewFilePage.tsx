@@ -43,25 +43,25 @@ function ViewFilePage() {
 
   return (
     <div className="sm:p-4 space-y-2">
-      <h1 className="text-3xl">{file?.id}: {file?.title}</h1>
+      <h1 className="text-3xl my-4"><span className="text-muted-foreground">#{file?.id}</span> {file?.title}</h1>
 
       <div className="shadow">
         <Table className="bg-white">
           <TableHeader className="bg-muted">
             <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>Updated by</TableHead>
-              <TableHead>Remarks</TableHead>
-              <TableHead>Forwarded to</TableHead>
-              <TableHead>Attachments</TableHead>
+              <TableHead className="w-40">Date</TableHead>
+              <TableHead className="w-full">Remarks</TableHead>
+              <TableHead className="text-nowrap">Updated by</TableHead>
+              <TableHead className="text-nowrap">Forwarded to</TableHead>
+              <TableHead className="w-24">Attachments</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {actions.map((action) => (
+            {actions.length > 0 ? actions.map((action) => (
               <TableRow key={action.id}>
-                <TableCell>{action.created_at}</TableCell>
+                <TableCell className="text-nowrap">{(new Date(action.created_at)).toDateString()}</TableCell>
+                <TableCell className="grow">{action.remarks}</TableCell>
                 <TableCell>{action.from_user}</TableCell>
-                <TableCell>{action.remarks}</TableCell>
                 <TableCell>{action.to_user}</TableCell>
                 <TableCell>
                   <button>
@@ -69,7 +69,13 @@ function ViewFilePage() {
                   </button>
                 </TableCell>
               </TableRow>
-            ))}
+            )) : (
+              <TableRow className="col-span-2">
+                <TableCell className="text-center text-l h-40" colSpan={5}>
+                  No updates found
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>

@@ -90,7 +90,7 @@ export default function Sidebar() {
         </ul>
       </div>
 
-      <main className="col-span-4 xl:col-span-5 bg-gray-50">
+      <main className="col-span-4 xl:col-span-5">
         <Outlet />
       </main>
     </div>

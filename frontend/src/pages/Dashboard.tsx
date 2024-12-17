@@ -11,7 +11,12 @@ import {
 import { IoEllipsisVertical } from "react-icons/io5";
 import { Input } from "../components/ui/input";
 import { Link } from "react-router-dom";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../components/ui/dropdown-menu";
 
 export interface IFile {
   id: string;
@@ -68,16 +73,18 @@ function Dashboard() {
                 <TableCell>{file.uploaded_by}</TableCell>
                 <TableCell>{file.created_at}</TableCell>
                 <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger className="ml-auto mr-2">
-                    <IoEllipsisVertical />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem asChild>
-                      <Link to={"/file/"+file.id}>View</Link>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger className="ml-auto mr-2">
+                      <IoEllipsisVertical />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem asChild>
+                        <Link to={"/file/" + encodeURIComponent(file.id)}>
+                          View
+                        </Link>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </TableCell>
               </TableRow>
             ))}
