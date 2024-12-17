@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -7,12 +8,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import React, { useEffect, useState } from "react";
 import { IoEllipsisVertical } from "react-icons/io5";
 import { Link } from "react-router-dom";
 import { IFile } from "./Dashboard";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-function CreateFile() {
+function MyDrafts() {
   const [files, setFiles] = useState<IFile[]>([]);
   const [error, setError] = useState<string | null>(null);
 
@@ -51,10 +52,10 @@ function CreateFile() {
         <Table className="bg-white">
           <TableHeader className="bg-muted">
             <TableRow>
-              <TableHead>File ID</TableHead>
+              <TableHead className="text-nowrap">File ID</TableHead>
               <TableHead>Title</TableHead>
               <TableHead>Content</TableHead>
-              <TableHead>Created on</TableHead>
+              <TableHead className="text-nowrap">Created on</TableHead>
               <TableHead>Action</TableHead>
             </TableRow>
           </TableHeader>
@@ -62,11 +63,25 @@ function CreateFile() {
             {files.map((file) => (
               <TableRow key={file.id}>
                 <TableCell>{file.id}</TableCell>
-                <TableCell className="line-clamp-1 h-9">{file.title}</TableCell>
-                <TableCell className="w-full">{file.content}</TableCell>
-                <TableCell>{file.created_at}</TableCell>
+                <TableCell className="text-nowrap">{file.title}</TableCell>
+                <TableCell className="w-full"><span className="overflow-hidden line-clamp-2">{file.content}</span></TableCell>
+                <TableCell className="text-nowrap">{(new Date(file.created_at)).toDateString()}</TableCell>
                 <TableCell>
-                  <IoEllipsisVertical />
+                <DropdownMenu>
+                    <DropdownMenuTrigger className="ml-auto mr-2">
+                      <IoEllipsisVertical />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem asChild>
+                        <Link to={"/files/create?file_id=" + file.id}>
+                          Edit
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                          Forward
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </TableCell>
               </TableRow>
             ))}
@@ -77,4 +92,4 @@ function CreateFile() {
   );
 }
 
-export default CreateFile;
+export default MyDrafts;

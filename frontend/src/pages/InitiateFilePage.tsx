@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { SERVER_URL } from "@/hooks/requests";
-import React, { FormEvent, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { getFile, SERVER_URL } from "@/hooks/requests";
+import React, { FormEvent, useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { IFile } from "./Dashboard";
 
 type File = {
   id?: string;
@@ -18,6 +19,8 @@ interface ErrType extends File {
 function InitiateFilePage() {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<ErrType>();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [file, setFile] = useState<IFile | null>();
 
   const navigate = useNavigate();
 
@@ -83,7 +86,7 @@ function InitiateFilePage() {
     setLoading(true);
     try {
       const response = await fetch(SERVER_URL + "/api/initiate_file", {
-        method: "POST",
+        method: (file && file.id) ? "PUT" : "POST",
         body: JSON.stringify(data),
         headers: {
           "Content-Type": "application/json",
@@ -104,6 +107,14 @@ function InitiateFilePage() {
     setLoading(false);
   }
 
+  useEffect(() => {
+    const file_id = searchParams.get("file_id");
+    if (file_id) {
+        getFile(file_id)
+        .then(setFile);
+    }
+  }, [searchParams.get("file_id")]);
+
   return (
     <div className="p-2 sm:p-4">
       <h1 className="text-2xl sm:text-4xl">Create File</h1>
@@ -112,24 +123,31 @@ function InitiateFilePage() {
         className="sm:mt-4 p-2 gap-4 grid sm:grid-cols-2 max-w-2xl"
         onSubmit={handleSubmit}
       >
-        <div className="space-y-1">
-          <label htmlFor="id">
-            File ID<span className="text-red-500">*</span>
-          </label>
-          <Input
-            onBlur={handleIdBlur}
-            id="id"
-            name="id"
-            placeholder="file id..."
-            required
-          />
-          {err?.id && <p className="text-destructive">{err.id}</p>}
-        </div>
+        {file?.id ? (
+          <div className="space-y-1">
+            <label htmlFor="id">File ID</label>
+            <h3 className="text-lg">{file.id}</h3>
+          </div>
+        ) : (
+          <div className="space-y-1">
+            <label htmlFor="id">
+              File ID<span className="text-red-500">*</span>
+            </label>
+            <Input
+              onBlur={handleIdBlur}
+              id="id"
+              name="id"
+              placeholder="file id..."
+              required
+            />
+            {err?.id && <p className="text-destructive">{err.id}</p>}
+          </div>
+        )}
         <div className="space-y-1">
           <label htmlFor="title">
             Title<span className="text-red-500">*</span>
           </label>
-          <Input id="title" name="title" placeholder="file id..." required />
+          <Input id="title" name="title" placeholder="file id..." required defaultValue={file?.title}/>
           {err?.title && <p className="text-destructive">{err.title}</p>}
         </div>
         <div className="sm:col-span-2 space-y-1">
@@ -142,6 +160,7 @@ function InitiateFilePage() {
             rows={7}
             placeholder="content..."
             required
+            defaultValue={file?.content}
           />
           {err?.content && <p className="text-destructive">{err.content}</p>}
         </div>
