@@ -8,16 +8,15 @@ import {
   TableRow,
 } from "../components/ui/table";
 import { IoEllipsisVertical } from "react-icons/io5";
-import { Input } from "../components/ui/input";
 import { getActions, getFile } from "../hooks/requests";
 import { useParams } from "react-router-dom";
 import { IFile } from "./Dashboard";
 
 export interface IAction {
   id: string;
-  to_user: string;
   from_user: string;
   remarks: string;
+  to_user: string;
   created_at: string;
 }
 

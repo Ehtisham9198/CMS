@@ -41,7 +41,7 @@ export default function Sidebar() {
             src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzyDY48gRqe4FukmulHf9vbO-oKNuD3TskTA&s"
             alt=""
           />
-          <span className="text-2xl text-rail-dark">Mo Files</span>
+          <span className="text-2xl text-rail-dark">CMS</span>
         </div>
 
         <hr />

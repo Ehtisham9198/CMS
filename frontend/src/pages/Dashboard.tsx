@@ -23,6 +23,7 @@ import {
 export interface IFile {
   id: string;
   title: string;
+  content?: string;
   uploaded_by: string;
   created_at?: string;
 }
@@ -91,10 +92,8 @@ function Dashboard() {
                           View
                         </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <button onClick={() => actionHandler(file.id)}>
+                      <DropdownMenuItem onClick={() => actionHandler(file.id)}>
                           Take Action
-                        </button>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

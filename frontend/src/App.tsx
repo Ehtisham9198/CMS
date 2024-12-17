@@ -15,6 +15,7 @@ import CreatedFiles from './pages/CreatedFiles.tsx'
 import SignUp from "./pages/SignUP.tsx";
 import ViewFilePage from "./pages/ViewFilePage.tsx";
 import Action from "./components/action.tsx";
+import InitiateFilePage from "./pages/InitiateFilePage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -54,6 +55,10 @@ const router = createBrowserRouter([
           {
             path: "/files",
             element: <CreateFile />,
+          },
+          {
+            path: "/files/create",
+            element: <InitiateFilePage />,
           },
           {
             path: "/file/:file_id",
