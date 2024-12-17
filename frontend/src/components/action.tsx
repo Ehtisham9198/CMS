@@ -11,6 +11,7 @@ const Action = () => {
   const [id, setId] = useState<string>("");
   const [forwardTo, setForwardTo] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+    const [remarks, setRemarks] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
 
   const location = useLocation();
@@ -38,6 +39,7 @@ const Action = () => {
           file_id: fileId,
           action: action,
           to_users: forwardTo,
+          remarks: remarks,
         }),
         credentials: "include",
       });
@@ -59,6 +61,15 @@ const Action = () => {
 
   return (
     <div>
+       <br />
+        <label htmlFor="remarks">Remarks</label> <br />
+        <input
+          type="text"
+          name="remarks"
+          value={remarks}
+          onChange={(e) => setRemarks(e.target.value)}
+        />
+        <br />
       <form onSubmit={ForwardFileHandler}>       
         <label htmlFor="action">Action</label>
         <br />

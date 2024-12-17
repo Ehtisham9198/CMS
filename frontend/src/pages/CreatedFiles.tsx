@@ -10,6 +10,7 @@ const CreatedFiles = () => {
   const [files, setFiles] = useState<File[]>([]);
   const [action, setAction] = useState<string>("");
   const [id, setId] = useState<string>("");
+  const [remarks, setRemarks] = useState<string>("");
   const [forwardTo, setForwardTo] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string>("");
@@ -56,6 +57,7 @@ const CreatedFiles = () => {
           file_id: id,
           action: action,
           to_users: forwardTo,
+          remarks: remarks,
         }),
         credentials: "include",
       });
@@ -100,6 +102,14 @@ const CreatedFiles = () => {
           name="id"
           value={id}
           onChange={(e) => setId(e.target.value)}
+        />
+        <br />
+        <label htmlFor="remarks">Remarks</label> <br />
+        <input
+          type="text"
+          name="remarks"
+          value={remarks}
+          onChange={(e) => setRemarks(e.target.value)}
         />
         <br />
         <label htmlFor="action">Action</label>

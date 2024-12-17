@@ -21,7 +21,7 @@ export const getTrack = async (req: Request, res: Response): Promise<any> => {
         .json({ error: "No actions found for this file ID" });
     }
 
-    console.log(result); // Optional for debugging
+    console.log(result);
 
     res.json({
       data: result,
@@ -97,7 +97,7 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
       return res.status(400).json({ error: "User not logged in" });
     }
 
-    let { file_id: id, action, to_users: to_designation } = req.body;
+    let { file_id: id, action,remarks, to_users: to_designation} = req.body;
 
     if (!id || !action) {
       return res.status(400).json({ error: "Missing required fields" });
@@ -119,7 +119,6 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
     const { title } = result1[0];
 
     // If the action is "forward," update the previous entry and create a new one
-    const remarks = "No remarks";
 
     if (action === "forward") {
       // Fetching the username of the user with the specified designation
@@ -188,6 +187,12 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
             console.log(previousUser[0].uploaded_by)
       }
 
+      if (previousUser === from_user) {
+        return res
+          .status(400)
+          .json({ error: "You cannot send files to yourself" });
+      }
+
       // Update the previous action to "Forwarded"
       await db`UPDATE actions 
                      SET action = 'Rejected' 
@@ -250,7 +255,7 @@ export const getInitiateFiles = async (
   res: Response
 ): Promise<any> => {
   try {
-    const { id, title } = req.body;
+    const { id, title,content } = req.body;
     console.log(req.body);
     let uploaded_by;
     if (req.session && req.session.user) {
@@ -258,7 +263,7 @@ export const getInitiateFiles = async (
     }
 
     const result =
-      await db`INSERT INTO files (id,title,uploaded_by) VALUES ( ${id}, ${title},${uploaded_by})`;
+      await db`INSERT INTO files (id,title,uploaded_by,content) VALUES ( ${id}, ${title},${uploaded_by},${content})`;
 
     res.json({
       message: "File initiated successfully",
