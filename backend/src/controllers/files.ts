@@ -159,7 +159,8 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
             });
         }
         if (action === "reject") {
-            const a = 'forwarded'
+
+            const a = 'Forwarded'
             const latestAction = await db`
             SELECT from_user
             FROM actions
