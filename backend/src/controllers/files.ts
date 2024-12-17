@@ -103,7 +103,7 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
 
         let { file_id: id, action, to_users: to_designation } = req.body;
 
-        if (!id || !to_designation || !action) {
+        if (!id || !action) {
             return res.status(400).json({ error: 'Missing required fields' });
         }
 
@@ -111,6 +111,87 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
         const check = await db`SELECT COUNT(*) AS count FROM files WHERE id = ${id}`;
         if (!check || !check.length || check[0].count === 0) {
             return res.status(404).json({ error: 'No files found for this id' });
+        }
+
+    
+        // Fetch file title
+        const result1 = await db`SELECT title FROM files WHERE id = ${id}`;
+        if (!result1 || !result1.length) {
+            return res.status(404).json({ error: 'No files found for the user' });
+        }
+
+        const { title } = result1[0];
+
+       
+        // If the action is "forward," update the previous entry and create a new one
+        const remarks = "No remarks";
+
+        if (action === "forward") {
+        // Fetching the username of the user with the specified designation
+        const result2 = await db`SELECT username FROM users WHERE designation = ${to_designation}`;
+        if (!result2 || !result2.length) {
+            return res.status(404).json({ error: 'No users found with the specified designation' });
+        }
+
+        const to_username = result2[0];
+        if (to_username.username === from_user) {
+            return res.status(400).json({ error: 'You cannot send files to yourself' });
+        }
+
+         // Check if both to_username and title are defined
+         if (!to_username.username || !title) {
+            return res.status(400).json({ error: 'Invalid data found for the file' });
+        }
+
+
+            // Update the previous action to "Forwarded"
+            await db`UPDATE actions 
+                     SET action = 'Forwarded' 
+                           WHERE  to_users = ${from_user} AND created_at = (SELECT MAX(created_at)FROM actions WHERE file_id = ${id});`;
+
+            // Insert the new "Pending" action for the receiving user
+            const result = await db`INSERT INTO actions(from_user, file_id, to_users, action, remarks, title) 
+                                    VALUES (${from_user}, ${id}, ${to_username.username}, 'Pending', ${remarks}, ${title})`;
+
+            return res.status(200).json({
+                message: 'File forwarded successfully',
+                fileData: result || {}
+            });
+        }
+        if (action === "reject") {
+            const a = 'forwarded'
+            const latestAction = await db`
+            SELECT from_user
+            FROM actions
+            WHERE file_id = ${id} AND action = ${a}
+            ORDER BY created_at DESC
+            LIMIT 1;`;
+
+        if (!latestAction || latestAction.length === 0) {
+            return res.status(404).json({ message: "No previous action found for this file." });
+        }
+
+        const previousUser = latestAction[0].from_user;
+
+
+            // Update the previous action to "Forwarded"
+            await db`UPDATE actions 
+                     SET action = 'Rejected' 
+                     WHERE  to_users = ${from_user} AND created_at = (SELECT MAX(created_at)FROM actions WHERE file_id = ${id});`;
+
+            // Insert the new "Pending" action for the receiving user
+            const result = await db`INSERT INTO actions(from_user, file_id, to_users, action, remarks, title) 
+                                    VALUES (${from_user}, ${id}, ${previousUser}, 'Pending', ${remarks}, ${title})`;
+
+            return res.status(200).json({
+                message: 'File forwarded successfully',
+                fileData: result || {}
+            });
+        }
+
+        // Initial "Send" action
+        if (action === "Send") {
+            action = "Pending";
         }
 
         // Fetching the username of the user with the specified designation
@@ -124,42 +205,12 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
             return res.status(400).json({ error: 'You cannot send files to yourself' });
         }
 
-        // Fetch file title
-        const result1 = await db`SELECT title FROM files WHERE id = ${id}`;
-        if (!result1 || !result1.length) {
-            return res.status(404).json({ error: 'No files found for the user' });
-        }
-
-        const { title } = result1[0];
-
-        // Check if both to_username and title are defined
-        if (!to_username.username || !title) {
+         // Check if both to_username and title are defined
+         if (!to_username.username || !title) {
             return res.status(400).json({ error: 'Invalid data found for the file' });
         }
 
-        // If the action is "forward," update the previous entry and create a new one
-        const remarks = "No remarks";
-
-        if (action === "forward") {
-            // Update the previous action to "Forwarded"
-            await db`UPDATE actions 
-                     SET action = 'Forwarded' 
-                     WHERE file_id = ${id} AND to_users = ${from_user}`;
-
-            // Insert the new "Pending" action for the receiving user
-            const result = await db`INSERT INTO actions(from_user, file_id, to_users, action, remarks, title) 
-                                    VALUES (${from_user}, ${id}, ${to_username.username}, 'Pending', ${remarks}, ${title})`;
-
-            return res.status(200).json({
-                message: 'File forwarded successfully',
-                fileData: result || {}
-            });
-        }
-
-        // Initial "Send" action
-        if (action === "Send") {
-            action = "Pending";
-        }
+        
 
         const result = await db`INSERT INTO actions(from_user, file_id, to_users, action, remarks, title) 
                                 VALUES (${from_user}, ${id}, ${to_username.username}, ${action}, ${remarks}, ${title})`;

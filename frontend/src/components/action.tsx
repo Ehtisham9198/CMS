@@ -22,7 +22,7 @@ const Action = () => {
   const ForwardFileHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!fileId || !action || !forwardTo) {
+    if (!fileId || !action || (!forwardTo && action === "forward")) {
       console.log("All fields must be filled", fileId, action, forwardTo);
       setError("All fields must be filled before forwarding.");
       return;
@@ -71,6 +71,7 @@ const Action = () => {
         >
           <option value="">Select Option</option>
           <option value="forward">Forward</option>
+          <option value="reject">Reject</option>
         </select>
 
         <br />
