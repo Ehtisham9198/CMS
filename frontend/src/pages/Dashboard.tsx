@@ -48,13 +48,11 @@ function Dashboard() {
       setFiles(files);
     })();
   }, []);
-  console.log(files)
+  console.log(files);
 
-
-  const actionHandler = (id:string) => {
-    navigate(`/action`, { state: { id } }); 
+  const actionHandler = (id: string) => {
+    navigate(`/action`, { state: { id } });
   };
-  
 
   return (
     <div className="sm:p-4 space-y-2">
@@ -94,9 +92,11 @@ function Dashboard() {
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                      <button onClick={() => actionHandler(file.id)}>Take Action</button>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
+                        <button onClick={() => actionHandler(file.id)}>
+                          Take Action
+                        </button>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
               </TableRow>
