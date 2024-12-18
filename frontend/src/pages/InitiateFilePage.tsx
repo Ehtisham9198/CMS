@@ -134,6 +134,7 @@ function InitiateFilePage() {
     <div className="p-2 sm:p-4">
       <h1 className="text-2xl sm:text-4xl sm:mb-4">Create File</h1>
       {err?.message && <p className="text-destructive">{err.message}</p>}
+
       <form
         className="p-2 gap-4 grid sm:grid-cols-2 max-w-2xl"
         onSubmit={handleSubmit}

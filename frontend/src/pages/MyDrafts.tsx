@@ -77,8 +77,10 @@ function MyDrafts() {
                           Edit
                         </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to={"/forward"}>
                           Forward
+                        </Link>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

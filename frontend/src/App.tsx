@@ -10,11 +10,11 @@ import LoginPage from "./pages/login.tsx";
 import SessionProvider from "./context/Session.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import UsersPage from "./pages/Users.tsx";
-import CreatedFiles from './pages/CreatedFiles.tsx'
 import SignUp from "./pages/SignUP.tsx";
 import ViewFilePage from "./pages/ViewFilePage.tsx";
 import Action from "./components/action.tsx";
 import InitiateFilePage from "./pages/InitiateFilePage.tsx";
+import Forward from "./components/forward.tsx"
 
 const router = createBrowserRouter([
   {
@@ -42,6 +42,10 @@ const router = createBrowserRouter([
         element: <Action/>,
       },
       {
+        path: "/forward",
+        element: <Forward/>,
+      },
+      {
         path: "/",
         element: (
             <Sidebar />
@@ -67,10 +71,6 @@ const router = createBrowserRouter([
             path: "/users",
             element: <UsersPage />,
           },
-          {
-            path:'/createdFiles',
-            element:<CreatedFiles/>
-          }
         ],
       },
     ],
