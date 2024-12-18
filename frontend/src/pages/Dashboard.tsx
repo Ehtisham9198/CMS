@@ -63,7 +63,7 @@ function Dashboard() {
       />
 
       <div className="shadow">
-        <Table className="bg-white">
+        <Table className="bg-popover">
           <TableHeader>
             <TableRow>
               <TableHead>File ID</TableHead>
