@@ -1,33 +1,45 @@
 import { Forward } from "lucide-react";
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 
 type File = {
   id: string;
   title: string;
+  content: string;
 };
 
 const CreatedFiles = () => {
   const [files, setFiles] = useState<File[]>([]);
-  const [action, setAction] = useState<string>("");
   const [id, setId] = useState<string>("");
   const [remarks, setRemarks] = useState<string>("");
   const [forwardTo, setForwardTo] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string>("");
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const fileIdFromUrl = searchParams.get("file_id");
+    if (fileIdFromUrl) {
+      setId(fileIdFromUrl);
+    } else {
+      setError("File ID is required to fetch the details.");
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const getFiles = async () => {
+      if (!id) return;
+
       try {
-        const response = await fetch("http://localhost:3000/api/get_files", {
+        const response = await fetch(`http://localhost:3000/api/fileById?file_id=${id}`, {
           credentials: "include",
         });
         const data = await response.json();
 
-        if (data.fileData && Array.isArray(data.fileData)) {
+        if (data.fileData) {
           setFiles(data.fileData);
         } else {
           setFiles([]);
-          console.error("Unexpected data structure:", data);
         }
       } catch (error) {
         console.error("Error fetching files:", error);
@@ -36,13 +48,12 @@ const CreatedFiles = () => {
     };
 
     getFiles();
-  }, [files]);
+  }, [id]);
 
   const ForwardFileHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!id || !action || !forwardTo) {
-      console.error("All fields must be filled");
+    if (!id || !forwardTo) {
       setError("All fields must be filled before forwarding.");
       return;
     }
@@ -55,7 +66,7 @@ const CreatedFiles = () => {
         },
         body: JSON.stringify({
           file_id: id,
-          action: action,
+          action: "Send",
           to_users: forwardTo,
           remarks: remarks,
         }),
@@ -64,7 +75,7 @@ const CreatedFiles = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setError(null); 
+        setError(null);
         setSuccessMessage("File forwarded successfully!");
       } else {
         setError(data.error || "Failed to forward file.");
@@ -77,87 +88,108 @@ const CreatedFiles = () => {
   };
 
   return (
-    <div>
-      <h1>Drafted Files</h1>
+    <div className="min-h-screen bg-gray-100 p-8">
+      <h1 className="text-3xl font-bold mb-6 text-center text-blue-600">Files Deatails</h1>
 
-      {error && <div style={{ color: "red" }}>{error}</div>}
+      {error && <div className="text-red-500 text-center mb-4">{error}</div>}
+      {successMessage && <div className="text-green-500 text-center mb-4">{successMessage}</div>}
 
-      {files.length > 0 ? (
-        <ul>
-          {files.map((file) => (
-            <li key={file.id}>
-              ID: {file.id}, Title: {file.title}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No files found.</p>
-      )}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        {files.length > 0 ? (
+          <div className="space-y-6">
+            {files.map((file) => (
+              <div key={file.id} className="p-4 border rounded-md shadow-sm bg-gray-50">
+                <div className="text-gray-800 font-semibold mb-2">File Details</div>
+                <div className="text-sm font-medium text-gray-700">
+                  <span className="font-semibold">ID:</span> {file.id}
+                </div>
+                <div className="text-sm font-medium text-gray-700">
+                  <span className="font-semibold">Title:</span> {file.title}
+                </div>
+                <div className="text-sm font-medium text-gray-700">
+                  <span className="font-semibold">Content:</span> {file.content}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-600 text-center">No files found.</p>
+        )}
+      </div>
 
-      <br />
-      <form onSubmit={ForwardFileHandler}>
-        <label htmlFor="id">Enter Id</label> <br />
-        <input
-          type="text"
-          name="id"
-          value={id}
-          onChange={(e) => setId(e.target.value)}
-        />
-        <br />
-        <label htmlFor="remarks">Remarks</label> <br />
-        <input
-          type="text"
-          name="remarks"
-          value={remarks}
-          onChange={(e) => setRemarks(e.target.value)}
-        />
-        <br />
-        <label htmlFor="action">Action</label>
-        <br />
-        <select
-          name="action"
-          id="action"
-          className="border p-2"
-          value={action}
-          onChange={(e) => setAction(e.target.value)}
-        >
-          <option value="">Select Option</option>
-          <option value="forward">Send</option>
-        </select>
 
-        <br />
-        <label htmlFor="forward">Forward to</label>
-        <br />
-        <select
-          name="forward"
-          id="forward"
-          className="border p-2"
-          value={forwardTo}
-          onChange={(e) => setForwardTo(e.target.value)}
-        >
-          <option value="">Select Receiver</option>
-          <option value="Dean A">Dean A</option>
-          <option value="Dean SA">Dean SA</option>
-          <option value="HoD CSE">HoD CSE</option>
-          <option value="HoD ETC">HoD ETC</option>
-          <option value="HoD EEE">HoD EEE</option>
-          <option value="Registrar">Registrar</option>
-          <option value="Director">Director</option>
-          <option value="Director">Convenor PEC</option>
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <form onSubmit={ForwardFileHandler}>
+          <div className="mb-6">
+            <label htmlFor="id" className="block text-gray-700 font-semibold mb-2">
+              File ID
+            </label>
+            <input
+              type="text"
+              name="id"
+              value={id}
+              disabled
+              className="w-full p-2 border rounded-lg bg-gray-100"
+            />
+          </div>
 
-        </select>
+          <div className="mb-6">
+            <label htmlFor="action" className="block text-gray-700 font-semibold mb-2">
+              Action
+            </label>
+            <input
+              type="text"
+              name="action"
+              value="Send"
+              disabled
+              className="w-full p-2 border rounded-lg bg-gray-100"
+            />
+          </div>
 
-        <br />
-        <br />
-        <button
-          className="px-2 py-1 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
-        >
-          Forward
-        </button>
-        <div className="popup success">
-          <p>{successMessage}</p>
-        </div>
-      </form>
+          <div className="mb-6">
+            <label htmlFor="remarks" className="block text-gray-700 font-semibold mb-2">
+              Remarks
+            </label>
+            <input
+              type="text"
+              name="remarks"
+              value={remarks}
+              onChange={(e) => setRemarks(e.target.value)}
+              className="w-full p-2 border rounded-lg"
+            />
+          </div>
+
+          <div className="mb-6">
+            <label htmlFor="forward" className="block text-gray-700 font-semibold mb-2">
+              Forward To
+            </label>
+            <select
+              name="forward"
+              id="forward"
+              className="w-full p-2 border rounded-lg"
+              value={forwardTo}
+              onChange={(e) => setForwardTo(e.target.value)}
+            >
+              <option value="">Select Receiver</option>
+              <option value="Dean A">Dean A</option>
+              <option value="Dean SA">Dean SA</option>
+              <option value="HoD CSE">HoD CSE</option>
+              <option value="HoD ETC">HoD ETC</option>
+              <option value="HoD EEE">HoD EEE</option>
+              <option value="Registrar">Registrar</option>
+              <option value="Director">Director</option>
+              <option value="Convenor PEC">Convenor PEC</option>
+            </select>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-200"
+          >
+            Forward
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
