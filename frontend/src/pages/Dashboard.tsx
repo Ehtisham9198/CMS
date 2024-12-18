@@ -49,7 +49,6 @@ function Dashboard() {
       setFiles(files);
     })();
   }, []);
-  console.log(files);
 
   const actionHandler = (id: string) => {
     navigate(`/action`, { state: { id } });

@@ -98,7 +98,7 @@ function InitiateFilePage() {
       if (response.ok) {
         navigate("/files");
       } else {
-        setErr(result.error || "Error initiating file");
+        setErr({message: result.error || "Error initiating file"});
       }
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -110,23 +110,22 @@ function InitiateFilePage() {
   useEffect(() => {
     const file_id = searchParams.get("file_id");
     if (file_id) {
-        getFile(file_id)
-        .then(setFile);
+        getFile(file_id).then(setFile);
     }
   }, [searchParams.get("file_id")]);
 
   return (
     <div className="p-2 sm:p-4">
-      <h1 className="text-2xl sm:text-4xl">Create File</h1>
-
+      <h1 className="text-2xl sm:text-4xl sm:mb-4">Create File</h1>
+      {err?.message && <p className="text-destructive">{err.message}</p>}
       <form
-        className="sm:mt-4 p-2 gap-4 grid sm:grid-cols-2 max-w-2xl"
+        className="p-2 gap-4 grid sm:grid-cols-2 max-w-2xl"
         onSubmit={handleSubmit}
-      >
+        >
         {file?.id ? (
           <div className="space-y-1">
-            <label htmlFor="id">File ID</label>
-            <h3 className="text-lg">{file.id}</h3>
+            <span>File ID:</span>
+            <h3 className="text-lg ml-2 font-semibold">{file.id}</h3>
           </div>
         ) : (
           <div className="space-y-1">

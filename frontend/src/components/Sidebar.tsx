@@ -16,7 +16,7 @@ import LoginPage from "../pages/login";
 
 export default function Sidebar() {
   const { session, revalidate } = useContext(sessionContext);
-  console.log("from sidebar", { session });
+  // console.log("from sidebar", { session });
 
   async function handleLogout() {
     const err = await logout();
