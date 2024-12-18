@@ -4,8 +4,7 @@ import {
   Outlet,
   RouterProvider,
 } from "react-router-dom";
-import CreateFile from "./pages/CreateFile.tsx";
-import CreateUser from "./pages/CreateUser.tsx";
+import MyDrafts from "./pages/MyDrafts.tsx";
 import Sidebar from "./components/Sidebar.tsx";
 import LoginPage from "./pages/login.tsx";
 import SessionProvider from "./context/Session.tsx";
@@ -15,6 +14,7 @@ import CreatedFiles from './pages/CreatedFiles.tsx'
 import SignUp from "./pages/SignUP.tsx";
 import ViewFilePage from "./pages/ViewFilePage.tsx";
 import Action from "./components/action.tsx";
+import InitiateFilePage from "./pages/InitiateFilePage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -53,7 +53,11 @@ const router = createBrowserRouter([
           },
           {
             path: "/files",
-            element: <CreateFile />,
+            element: <MyDrafts />,
+          },
+          {
+            path: "/files/create",
+            element: <InitiateFilePage />,
           },
           {
             path: "/file/:file_id",

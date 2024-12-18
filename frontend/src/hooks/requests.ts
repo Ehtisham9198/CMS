@@ -5,7 +5,7 @@ export const SERVER_URL = import.meta.env.VITE_SERVER_URL || "http://localhost:3
 
 export async function logout(): Promise<string | null> {
     try {
-        const response = await fetch(SERVER_URL + '/api/logout', {
+        const response = await fetch(SERVER_URL + '/api/auth/logout', {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -22,19 +22,17 @@ export async function logout(): Promise<string | null> {
 
 export async function login(username: string, password: string): Promise<string | null> {
     try {
-        const response = await fetch(SERVER_URL + '/api/login', {
+        const response = await fetch(SERVER_URL + '/api/auth/login', {
             method: "POST",
             body: JSON.stringify({ username, password }),
             headers: {
                 "Content-Type": "application/json",
             },
             credentials: 'include'
-
         });
 
         if (response.ok) {
-            const data = await response.json();
-            console.log('Login successful:', data);
+            // console.log('Login successful:', await response.json());
             return null;
         } else {
             const errorData = await response.json();
@@ -54,7 +52,7 @@ export const getFiles = async (): Promise<IFile[]> => {
             credentials: "include",
         });
         const data = await response.json();
-        console.log(data)
+
         return data.fileData as IFile[]
     } catch (error) {
         console.error("Error fetching files:", error);

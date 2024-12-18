@@ -1,24 +1,22 @@
 import React, { useContext, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { sessionContext } from "../context/Session";
 import { login } from "../hooks/requests";
 
 const LoginPage = () => {
-  const [params] = useSearchParams();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
   const navigate = useNavigate();
 
-  const { session, revalidate } = useContext(sessionContext);
-  console.log({session});
-  
+  const { revalidate } = useContext(sessionContext);
+
   function isValid() {
     if (password.length < 1) {
       setErr("password should be at least 1 characters long");
       return false;
     }
-    
+
     return true;
   }
   
@@ -33,7 +31,7 @@ const LoginPage = () => {
     } else {
       await revalidate();
       if(document.location.pathname === "/login")
-        navigate(params.get("redirect") || "/dashboard");
+        navigate("/dashboard");
     }
   };
 

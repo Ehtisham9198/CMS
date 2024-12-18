@@ -1,12 +1,10 @@
 import {Router} from "express";
-import { getChangedPassward, getCreateUser, getLogin, getLogout } from "../controllers/auth";
+import { changedPassward, createUser, getAllDesignations } from "../controllers/user";
 
 const userRounter = Router();
 
-
-userRounter.post("/CreateUser", getCreateUser);
-userRounter.post("/login", getLogin);
-userRounter.post("/ChangePassword", getChangedPassward);
-userRounter.post("/logout", getLogout);
+userRounter.post("/CreateUser", createUser);
+userRounter.post("/ChangePassword", changedPassward);
+userRounter.get("/user/designations", getAllDesignations);
 
 export default userRounter;

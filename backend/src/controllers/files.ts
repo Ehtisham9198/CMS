@@ -40,7 +40,7 @@ export const getFiles = async (req: Request, res: Response): Promise<any> => {
     }
     const User = req.session.user.username;
     const result = await db`
-    SELECT f.id, f.title 
+    SELECT f.id, f.title, f.content, f.created_at
     FROM files f
     LEFT JOIN actions a ON f.id = a.file_id
     WHERE f.uploaded_by = ${User} AND a.file_id IS NULL;
@@ -160,13 +160,13 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
       });
     }
     if (action === "reject") {
-      let previousUser = (await db`
+      let previousUser = await db`
             SELECT username
             FROM paths
             WHERE file_id = ${id}
             ORDER BY created_at DESC
             OFFSET 1
-            LIMIT 1`)[0]?.username;
+            LIMIT 1`;
 
       await db`DELETE FROM paths
             WHERE file_id = ${id}
@@ -196,7 +196,7 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
       // Insert the new "Pending" action for the receiving user
       const result =
         await db`INSERT INTO actions(from_user, file_id, to_users, action, remarks, title) 
-                                    VALUES (${from_user}, ${id}, ${previousUser}, 'Pending', ${remarks}, ${title})`;
+                                    VALUES (${from_user}, ${id}, ${previousUser[0].username}, 'Pending', ${remarks}, ${title})`;
 
       return res.status(200).json({
         message: "File forwarded successfully",
