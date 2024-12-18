@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getActions, getFile, getFiles, getInitiateFiles, getMyInitiatedFiles, getReceivedFiles, getTrack } from "../controllers/files";
+import { getActions, getEditFile, getFile, getFiles, getInitiateFiles, getMyInitiatedFiles, getReceivedFiles, getTrack } from "../controllers/files";
 import { isAuthenticated } from "../middlewares/auth";
 const fileRouter = Router();
 
@@ -11,6 +11,7 @@ fileRouter.get('/MyInitiatesFiles', getMyInitiatedFiles);  //lagana h isko
 fileRouter.post('/file_forward', getActions);
 fileRouter.post('/initiate_file', getInitiateFiles);
 fileRouter.get('/ReceivedFiles', getReceivedFiles);
+fileRouter.post('/editfile', getEditFile);
 
 
 

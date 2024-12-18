@@ -21,8 +21,6 @@ export const getTrack = async (req: Request, res: Response): Promise<any> => {
         .json({ error: "No actions found for this file ID" });
     }
 
-    console.log(result);
-
     res.json({
       data: result,
     });
@@ -119,7 +117,6 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
     const { title } = result1[0];
 
     // If the action is "forward," update the previous entry and create a new one
-
     if (action === "forward") {
       // Fetching the username of the user with the specified designation
       const result2 =
@@ -146,8 +143,8 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
 
       // Update the previous action to "Forwarded"
       await db`UPDATE actions 
-                     SET action = 'Forwarded' 
-                           WHERE  to_users = ${from_user} AND created_at = (SELECT MAX(created_at)FROM actions WHERE file_id = ${id})`;
+                SET action = 'Forwarded' 
+                WHERE  to_users = ${from_user} AND created_at = (SELECT MAX(created_at)FROM actions WHERE file_id = ${id})`;
 
       // Update the previous action to "Forwarded"
       await db`INSERT INTO paths(username,file_id) VALUES (${to_username.username},${id})`;
@@ -179,12 +176,10 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
             WHERE file_id = ${id})`;
 
       if (!previousUser || previousUser.length === 0) {
-        console.log(previousUser,"first")
         previousUser = (await db`
             SELECT uploaded_by
             FROM files
             WHERE id = ${id}`)[0]?.uploaded_by;
-            console.log(previousUser[0].uploaded_by)
       }
 
       if (previousUser === from_user) {
@@ -255,8 +250,7 @@ export const getInitiateFiles = async (
   res: Response
 ): Promise<any> => {
   try {
-    const { id, title,content } = req.body;
-    console.log(req.body);
+    const { id, title,content} = req.body;
     let uploaded_by;
     if (req.session && req.session.user) {
       uploaded_by = req.session.user.username;
@@ -312,3 +306,20 @@ export const getReceivedFiles = async (
     res.status(500).json({ error: "Error fetching received files" });
   }
 };
+
+
+export const getEditFile =async(req:Request,res:Response)=>{
+try{
+ const {id,title,content} = req.body
+ await db `UPDATE files SET title = ${title},content= ${content} WHERE id=${id}`
+ res.status(200).json({
+    message: "Editted successfully",
+})
+}catch(error)
+{
+    res.status(500).json({error: 'Error in Editing'})
+}
+
+
+
+}

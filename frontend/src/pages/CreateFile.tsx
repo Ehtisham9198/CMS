@@ -12,27 +12,7 @@ function CreateFile() {
             file_path: formData.path
         };
 
-        try {
-            const response = await fetch('http://localhost:3000/api/initiate_file', {
-                method: "POST",
-                body: JSON.stringify(data),
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                credentials:'include'
-            });
-
-            const result = await response.json();
-            if (response.ok) {
-                setResponseMessage('File initiated successfully!');
-            } else {
-                setResponseMessage(result.error || 'Error initiating file');
-            }
-        } catch (error) {
-            console.error('Error submitting form:', error);
-            setResponseMessage('An error occurred. Please try again.');
-        }
-    };
+        
 
     return (
         <div>
@@ -52,5 +32,5 @@ function CreateFile() {
         </div>
     );
 }
-
+}
 export default CreateFile;

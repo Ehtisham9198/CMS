@@ -41,7 +41,7 @@ export default function Sidebar() {
             src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzyDY48gRqe4FukmulHf9vbO-oKNuD3TskTA&s"
             alt=""
           />
-          <span className="text-2xl text-rail-dark">Mo Files</span>
+          <span className="text-2xl text-rail-dark">CMS</span>
         </div>
 
         <hr />
@@ -52,7 +52,7 @@ export default function Sidebar() {
             src="https://icons.veryicon.com/png/o/miscellaneous/user-avatar/user-avatar-male-5.png"
             alt=""
           />
-          <h3>{session.user.username}</h3>
+          <h3>{session.user.username} <span className="text-xs text-muted-foreground"> ( {session.user.designation} )</span></h3>
           <DropdownMenu>
             <DropdownMenuTrigger className="ml-auto mr-2">
               <IoEllipsisVertical />

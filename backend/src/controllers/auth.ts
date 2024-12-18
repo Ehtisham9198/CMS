@@ -34,12 +34,13 @@ export const getCreateUser=async (req:Request, res:Response) => {
 export const getLogin= async (req:Request, res:Response): Promise<any> => {
     try {
         const { username, password } = req.body;
-        const result = await db `SELECT email, password FROM users WHERE username = ${username}`;
+        const result = await db `SELECT email,designation,name, password FROM users WHERE username = ${username}`;
+        
  
         const user = result[0];
         if (user?.password && await bcrypt.compare(password, user.password)) {
             if (req.session) {
-                req.session.user = { username: username }; 
+                req.session.user = { username: username, designation:result[0].designation,name:result[0].name }; 
             }
             return res.json({
                 message: 'Logged in successfully',
