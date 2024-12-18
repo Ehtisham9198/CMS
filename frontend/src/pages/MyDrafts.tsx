@@ -47,6 +47,9 @@ function MyDrafts() {
       <Button asChild>
         <Link to="/files/create">Create new</Link>
       </Button>
+      <br />
+      <br />
+      <h1>Created Files</h1>
 
       <div className="shadow">
         <Table className="bg-white">
@@ -78,7 +81,7 @@ function MyDrafts() {
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link to={"/forward"}>
+                        <Link to={"/forward/?file_id=" + file.id}>
                           Forward
                         </Link>
                       </DropdownMenuItem>

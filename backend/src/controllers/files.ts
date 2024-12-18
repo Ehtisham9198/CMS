@@ -327,3 +327,35 @@ try{
 
 
 }
+
+
+
+export const getfileById = async (req: Request, res: Response):Promise<any> => {
+
+    try {
+      const fileId = req.query.file_id as string;
+      if (!(req.session && req.session.user)) {
+        return res.status(401).json({ error: "Unauthorized access" });
+      }
+      const User = req.session.user.username;
+      
+      if (!fileId) {
+        return res.status(400).json({ error: "File ID is required" });
+      }
+      
+      const result = await db`
+      SELECT id, title, content, created_at
+      FROM files 
+      WHERE uploaded_by = ${User} AND id = ${fileId}`;
+      
+  
+      res.json({
+        massage: "file is fetched",
+        fileData: result,
+      });
+    } catch (error) {
+      console.error("Error in fetching files:", error);
+      res.status(500).json({ error: "Error in fetching files" }); 
+    }
+};
+
