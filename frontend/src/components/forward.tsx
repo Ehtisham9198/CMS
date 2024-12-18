@@ -1,6 +1,7 @@
 import { Forward } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 type File = {
   id: string;
@@ -16,6 +17,7 @@ const CreatedFiles = () => {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fileIdFromUrl = searchParams.get("file_id");
@@ -77,6 +79,9 @@ const CreatedFiles = () => {
       if (response.ok) {
         setError(null);
         setSuccessMessage("File forwarded successfully!");
+        setTimeout(() => {
+            navigate("/files");
+          }, 1000);
       } else {
         setError(data.error || "Failed to forward file.");
         setSuccessMessage("");
@@ -89,7 +94,7 @@ const CreatedFiles = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
-      <h1 className="text-3xl font-bold mb-6 text-center text-blue-600">Files Deatails</h1>
+      <h1 className="text-3xl font-bold mb-6 text-center text-blue-600">Files Details</h1>
 
       {error && <div className="text-red-500 text-center mb-4">{error}</div>}
       {successMessage && <div className="text-green-500 text-center mb-4">{successMessage}</div>}
@@ -99,7 +104,6 @@ const CreatedFiles = () => {
           <div className="space-y-6">
             {files.map((file) => (
               <div key={file.id} className="p-4 border rounded-md shadow-sm bg-gray-50">
-                <div className="text-gray-800 font-semibold mb-2">File Details</div>
                 <div className="text-sm font-medium text-gray-700">
                   <span className="font-semibold">ID:</span> {file.id}
                 </div>
@@ -120,32 +124,6 @@ const CreatedFiles = () => {
 
       <div className="bg-white rounded-lg shadow-md p-6">
         <form onSubmit={ForwardFileHandler}>
-          <div className="mb-6">
-            <label htmlFor="id" className="block text-gray-700 font-semibold mb-2">
-              File ID
-            </label>
-            <input
-              type="text"
-              name="id"
-              value={id}
-              disabled
-              className="w-full p-2 border rounded-lg bg-gray-100"
-            />
-          </div>
-
-          <div className="mb-6">
-            <label htmlFor="action" className="block text-gray-700 font-semibold mb-2">
-              Action
-            </label>
-            <input
-              type="text"
-              name="action"
-              value="Send"
-              disabled
-              className="w-full p-2 border rounded-lg bg-gray-100"
-            />
-          </div>
-
           <div className="mb-6">
             <label htmlFor="remarks" className="block text-gray-700 font-semibold mb-2">
               Remarks

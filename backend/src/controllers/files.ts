@@ -285,7 +285,7 @@ export const getReceivedFiles = async (
 
     // Fetch pending files for the current user
     const result = await db`
-            SELECT files.id as id,files.title AS title,from_user AS forwarded_by,files.uploaded_by AS uploaded_by,files.created_at AS created_at
+            SELECT files.id as id,files.title AS title,from_user AS forwarded_by,files.uploaded_by AS uploaded_by,files.created_at AS created_at, files.content as content
             FROM actions JOIN files ON actions.file_id = files.id
             WHERE actions.to_users = ${my_username} AND actions.action = ${actionState}
         `;
@@ -338,7 +338,7 @@ export const getfileById = async (req: Request, res: Response):Promise<any> => {
         return res.status(401).json({ error: "Unauthorized access" });
       }
       const User = req.session.user.username;
-      
+
       if (!fileId) {
         return res.status(400).json({ error: "File ID is required" });
       }
