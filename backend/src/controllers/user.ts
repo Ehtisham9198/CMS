@@ -66,3 +66,13 @@ export const changedPassward = tryCatch(async (req, res) => {
         message: 'Password changed successfully',
     });
 });
+
+
+export const getAllDesignations = tryCatch(async (req, res) => {
+    const designations = await db`SELECT DISTINCT designation FROM users`;
+
+    res.json({
+        success: true,
+        data: designations,
+    });
+});
