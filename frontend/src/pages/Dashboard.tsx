@@ -75,8 +75,8 @@ function Dashboard() {
       />
 
       <div className="shadow">
-        <Table className="bg-white">
-          <TableHeader className="bg-muted">
+        <Table className="bg-popover">
+          <TableHeader>
             <TableRow>
               <TableHead>File ID</TableHead>
               <TableHead>Title</TableHead>

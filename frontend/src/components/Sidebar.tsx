@@ -34,7 +34,7 @@ export default function Sidebar() {
 
   return (
     <div className="lg:grid grid-cols-5 xl:grid-cols-6 min-h-screen">
-      <div className="bg-white w-full h-full border-r">
+      <div className="w-full h-full border-r">
         <div className="text-xl h-12 m-1 lg:m-2 relative font-bold flex gap-4 items-center">
           <img
             className="h-full aspect-square object-contain"
@@ -67,7 +67,7 @@ export default function Sidebar() {
 
         {/* DASHBOARD */}
         {/* <h5 className="hidden lg:block text-lg p-2 font-bold">Dashboard</h5> */}
-        <ul className="grid grid-cols-4 lg:flex lg:flex-col gap-1 p-2 lg:py-0 w-full lg:w-auto justify-around border lg:border-none">
+        <ul className="grid grid-cols-4 lg:flex lg:flex-col gap-1 lg:p-2 lg:py-0 w-full lg:w-auto justify-around border lg:border-none">
           <SidebarLink href="/dashboard">
             <RiDashboardFill size={20} />
             <span className="text-xs lg:text-base">Dashboard</span>
@@ -105,10 +105,10 @@ const SidebarLink = ({
     <NavLink
       className={({ isActive }) =>
         [
-          "flex font-semibold lg:flex-row lg:p-2 lg:border flex-col lg:gap-2 items-center lg:px-5 lg:py-3 rounded ",
+          "flex font-semibold lg:flex-row p-2 lg:border flex-col lg:gap-2 items-center lg:px-5 lg:py-3 rounded ",
           isActive
-            ? "text-black border-black"
-            : "text-black/60 hover:border-rail-dark",
+            ? "text-primary border-primary bg-primary/10"
+            : "text-primary/60",
         ].join(" ")
       }
       to={href}

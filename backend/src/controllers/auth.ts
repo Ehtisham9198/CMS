@@ -14,7 +14,7 @@ export const login = tryCatch(async (req, res) => {
         });
     }
 
-    const [user] = await db`SELECT email, password FROM users WHERE username = ${username}`;
+    const [user] = await db`SELECT email, password, designation FROM users WHERE username = ${username}`;
 
     if (!user?.password || !await bcrypt.compare(password, user.password)) {
         return res.status(401).json({
@@ -24,7 +24,7 @@ export const login = tryCatch(async (req, res) => {
     }
 
     if (req.session) {
-        req.session.user = { username: username };
+        req.session.user = { username: username, designation: user.designation };
     }
 
     return res.json({

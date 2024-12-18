@@ -46,7 +46,7 @@ function ViewFilePage() {
 
       <div className="shadow">
         <Table className="bg-white">
-          <TableHeader className="bg-muted">
+          <TableHeader>
             <TableRow>
               <TableHead className="w-40">Date</TableHead>
               <TableHead className="w-full">Remarks</TableHead>
