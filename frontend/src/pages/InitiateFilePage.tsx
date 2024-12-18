@@ -79,7 +79,6 @@ function InitiateFilePage() {
     data.title = data.title?.trim();
     data.content = data.content?.trim();
 
-
     err.id = validFileId(data.id);
     if (!data.title) {
       err.title = "title cannot be empty";
@@ -96,8 +95,6 @@ function InitiateFilePage() {
     }
 
     setLoading(true);
-
-
 
     try {
       const response = await fetch(SERVER_URL + "/api/initiate_file", {
@@ -119,6 +116,7 @@ function InitiateFilePage() {
       console.error("Error submitting form:", error);
       setErr({ message: "An error occurred. Please try again." });
     }
+
     setLoading(false);
   }
 

@@ -50,7 +50,7 @@ function MyDrafts() {
 
       <div className="shadow">
         <Table className="bg-white">
-          <TableHeader className="bg-muted">
+          <TableHeader>
             <TableRow>
               <TableHead className="text-nowrap">File ID</TableHead>
               <TableHead>Title</TableHead>

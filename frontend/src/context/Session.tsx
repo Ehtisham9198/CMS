@@ -4,7 +4,8 @@ import { SERVER_URL } from "../hooks/requests";
 type User = {
   username: string;
   name?: string;
-  department?: string;
+  email?: string;
+  designation?: string;
 } | null;
 
 export const sessionContext = createContext<{
