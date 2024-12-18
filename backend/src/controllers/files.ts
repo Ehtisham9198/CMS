@@ -308,9 +308,13 @@ export const getReceivedFiles = async (
 };
 
 
-export const getEditFile =async(req:Request,res:Response)=>{
+export const getEditFile =async(req:Request,res:Response): Promise<any>=>{
 try{
  const {id,title,content} = req.body
+ if (!id || !title || !content) {
+  return res.status(400).json({ error: "All fields are required" });
+}
+ console.log(req.body)
  await db `UPDATE files SET title = ${title},content= ${content} WHERE id=${id}`
  res.status(200).json({
     message: "Editted successfully",

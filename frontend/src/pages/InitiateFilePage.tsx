@@ -55,6 +55,9 @@ function InitiateFilePage() {
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
+
+
     let err: File = {
       id: undefined,
       title: undefined,
@@ -64,9 +67,18 @@ function InitiateFilePage() {
     const data = Object.fromEntries(
       new FormData(e.currentTarget).entries()
     ) as File;
-    data.id = data.id?.trim();
+    
+
+    // Extra check
+    if (file?.id) {
+      data.id = file.id;
+    } else {
+      data.id = data.id?.trim();
+    }
+  
     data.title = data.title?.trim();
     data.content = data.content?.trim();
+
 
     err.id = validFileId(data.id);
     if (!data.title) {
@@ -84,6 +96,9 @@ function InitiateFilePage() {
     }
 
     setLoading(true);
+
+
+
     try {
       const response = await fetch(SERVER_URL + "/api/initiate_file", {
         method: (file && file.id) ? "PUT" : "POST",
@@ -110,9 +125,10 @@ function InitiateFilePage() {
   useEffect(() => {
     const file_id = searchParams.get("file_id");
     if (file_id) {
-        getFile(file_id).then(setFile);
+      getFile(file_id).then(setFile);
     }
-  }, [searchParams.get("file_id")]);
+  }, [searchParams]);
+  
 
   return (
     <div className="p-2 sm:p-4">

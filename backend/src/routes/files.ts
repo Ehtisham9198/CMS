@@ -11,7 +11,7 @@ fileRouter.get('/MyInitiatesFiles', getMyInitiatedFiles);  //lagana h isko
 fileRouter.post('/file_forward', getActions);
 fileRouter.post('/initiate_file', getInitiateFiles);
 fileRouter.get('/ReceivedFiles', getReceivedFiles);
-fileRouter.post('/editfile', getEditFile);
+fileRouter.put('/initiate_file', getEditFile);
 
 
 
