@@ -51,7 +51,13 @@ export default function Sidebar() {
             src="https://icons.veryicon.com/png/o/miscellaneous/user-avatar/user-avatar-male-5.png"
             alt=""
           />
-          <h3>{session.user.username} <span className="text-xs text-muted-foreground"> ( {designation})</span></h3>
+          <h3>
+            {session.user.username}{" "}
+            <span className="text-xs text-muted-foreground">
+              {" "}
+              {session.user.designation}
+            </span>
+          </h3>
           <DropdownMenu>
             <DropdownMenuTrigger className="ml-auto mr-2">
               <IoEllipsisVertical />

@@ -56,8 +56,6 @@ function InitiateFilePage() {
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-
-
     let err: File = {
       id: undefined,
       title: undefined,
@@ -67,7 +65,6 @@ function InitiateFilePage() {
     const data = Object.fromEntries(
       new FormData(e.currentTarget).entries()
     ) as File;
-    
 
     // Extra check
     if (file?.id) {
@@ -75,7 +72,7 @@ function InitiateFilePage() {
     } else {
       data.id = data.id?.trim();
     }
-  
+
     data.title = data.title?.trim();
     data.content = data.content?.trim();
 
@@ -98,7 +95,7 @@ function InitiateFilePage() {
 
     try {
       const response = await fetch(SERVER_URL + "/api/initiate_file", {
-        method: (file && file.id) ? "PUT" : "POST",
+        method: file && file.id ? "PUT" : "POST",
         body: JSON.stringify(data),
         headers: {
           "Content-Type": "application/json",
@@ -110,7 +107,7 @@ function InitiateFilePage() {
       if (response.ok) {
         navigate("/files");
       } else {
-        setErr({message: result.error || "Error initiating file"});
+        setErr({ message: result.error || "Error initiating file" });
       }
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -126,7 +123,6 @@ function InitiateFilePage() {
       getFile(file_id).then(setFile);
     }
   }, [searchParams]);
-  
 
   return (
     <div className="p-2 sm:p-4">
@@ -136,7 +132,7 @@ function InitiateFilePage() {
       <form
         className="p-2 gap-4 grid sm:grid-cols-2 max-w-2xl"
         onSubmit={handleSubmit}
-        >
+      >
         {file?.id ? (
           <div className="space-y-1">
             <span>File ID:</span>
@@ -161,7 +157,13 @@ function InitiateFilePage() {
           <label htmlFor="title">
             Title<span className="text-red-500">*</span>
           </label>
-          <Input id="title" name="title" placeholder="file id..." required defaultValue={file?.title}/>
+          <Input
+            id="title"
+            name="title"
+            placeholder="file id..."
+            required
+            defaultValue={file?.title}
+          />
           {err?.title && <p className="text-destructive">{err.title}</p>}
         </div>
         <div className="sm:col-span-2 space-y-1">
@@ -179,7 +181,6 @@ function InitiateFilePage() {
           {err?.content && <p className="text-destructive">{err.content}</p>}
         </div>
 
-        
         <Button className="sm:col-span-2" disabled={loading}>
           {loading ? "Pending..." : "Submit"}
         </Button>
