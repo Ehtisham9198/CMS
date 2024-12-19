@@ -19,6 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
+import { useSession } from "@/context/Session";
 
 export interface IFile {
   id: string;
@@ -32,6 +33,9 @@ function Dashboard() {
   const [files, setFiles] = useState<IFile[]>([]);
   const [filter, setFilter] = useState<string>("");
   const navigate = useNavigate();
+  const session = useSession()
+  const username = session?.user?.username
+
 
   const filteredList = useMemo(() => {
     const q = filter.toLowerCase();
@@ -47,11 +51,20 @@ function Dashboard() {
     (async () => {
       const files = await getFiles();
       setFiles(files);
+      console.log(files)
     })();
   }, []);
 
   const actionHandler = (id: string) => {
     navigate(`/action`, { state: { id } });
+  };
+
+  const EditHandler = (id: string, uploadedBy: string) => {
+    if (username === uploadedBy) {
+      navigate("/files/create?file_id=" + id);
+    } else {
+      return;
+    }
   };
 
   return (
@@ -93,6 +106,9 @@ function Dashboard() {
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => actionHandler(file.id)}>
                           Take Action
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => EditHandler(file.id, file.uploaded_by)}>
+                        {username === file.uploaded_by && "Edit"}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

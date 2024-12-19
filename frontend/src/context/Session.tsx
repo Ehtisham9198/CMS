@@ -9,7 +9,7 @@ type User = {
 } | null;
 
 export const sessionContext = createContext<{
-  session: { user?: User } | null;
+  session: { user?: User} | null;
   revalidate: () => Promise<void>;
 }>({ session: null, revalidate: async () => {} });
 
@@ -27,7 +27,6 @@ function SessionProvider({ children }: { children: React.JSX.Element }) {
       if (response.ok) {
         const data = await response.json();
         setSession(data.session);
-        console.log(data.session);
       }
     } catch (error) {
       console.log(error);
