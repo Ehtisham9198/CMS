@@ -68,7 +68,7 @@ function Dashboard() {
             <TableRow>
               <TableHead>File ID</TableHead>
               <TableHead>Title</TableHead>
-              <TableHead>Initiated by</TableHead>
+              <TableHead className="text-nowrap">Initiated by</TableHead>
               <TableHead>Created on</TableHead>
               <TableHead>Action</TableHead>
             </TableRow>
@@ -77,9 +77,9 @@ function Dashboard() {
             {filteredList.map((file) => (
               <TableRow key={file.id}>
                 <TableCell>{file.id}</TableCell>
-                <TableCell className="line-clamp-1 h-9">{file.title}</TableCell>
-                <TableCell>{file.uploaded_by}</TableCell>
-                <TableCell>{file.created_at}</TableCell>
+                <TableCell className="w-full">{file.title}</TableCell>
+                <TableCell className="text-nowrap">{file.uploaded_by}</TableCell>
+                <TableCell className="text-nowrap">{(new Date(file.created_at)).toDateString()}</TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger className="ml-auto mr-2">

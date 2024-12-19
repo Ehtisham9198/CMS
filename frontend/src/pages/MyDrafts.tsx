@@ -12,6 +12,7 @@ import { IoEllipsisVertical } from "react-icons/io5";
 import { Link } from "react-router-dom";
 import { IFile } from "./Dashboard";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { SERVER_URL } from "@/hooks/requests";
 
 function MyDrafts() {
   const [files, setFiles] = useState<IFile[]>([]);
@@ -20,7 +21,7 @@ function MyDrafts() {
   useEffect(() => {
     const getFiles = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/get_files", {
+        const response = await fetch(SERVER_URL + "/api/get_files", {
           credentials: "include",
         });
         const data = await response.json();
@@ -81,8 +82,8 @@ function MyDrafts() {
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link to={"/forward/?file_id=" + file.id}>
-                          Forward
+                        <Link to={"/files/initiate?file_id=" + file.id}>
+                          Send
                         </Link>
                       </DropdownMenuItem>
                     </DropdownMenuContent>

@@ -16,7 +16,6 @@ import LoginPage from "../pages/login";
 
 export default function Sidebar() {
   const { session, revalidate } = useContext(sessionContext);
-  // console.log("from sidebar", { session });
 
   async function handleLogout() {
     const err = await logout();
@@ -82,8 +81,6 @@ export default function Sidebar() {
             <IoIosPeople size={20} />
             <span className="text-xs lg:text-base">Users</span>
           </SidebarLink>
-
-
         </ul>
       </div>
 
@@ -107,7 +104,7 @@ const SidebarLink = ({
         [
           "flex font-semibold lg:flex-row p-2 lg:border flex-col lg:gap-2 items-center lg:px-5 lg:py-3 rounded ",
           isActive
-            ? "text-primary border-primary bg-primary/10"
+            ? "text-primary border-primary bg-primary/5"
             : "text-primary/60",
         ].join(" ")
       }

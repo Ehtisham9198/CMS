@@ -14,7 +14,7 @@ import SignUp from "./pages/SignUP.tsx";
 import ViewFilePage from "./pages/ViewFilePage.tsx";
 import Action from "./components/action.tsx";
 import InitiateFilePage from "./pages/InitiateFilePage.tsx";
-import Forward from "./components/forward.tsx"
+import Forward from "./components/initiateForm.tsx"
 
 const router = createBrowserRouter([
   {
@@ -42,13 +42,9 @@ const router = createBrowserRouter([
         element: <Action/>,
       },
       {
-        path: "/forward",
-        element: <Forward/>,
-      },
-      {
         path: "/",
         element: (
-            <Sidebar />
+          <Sidebar />
         ),
         children: [
           {
@@ -66,6 +62,10 @@ const router = createBrowserRouter([
           {
             path: "/file/:file_id",
             element: <ViewFilePage />,
+          },
+          {
+            path: "/files/initiate",
+            element: <Forward/>,
           },
           {
             path: "/users",
