@@ -97,7 +97,6 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
     }
 
     let { file_id: id, action,remarks, to_users: to_designation} = req.body;
-    console.log(req.body)
 
     if (!id || !action) {
       return res.status(400).json({ error: "Missing required fields" });
@@ -184,7 +183,6 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
             FROM files
             WHERE id = ${id}`)[0]?.uploaded_by;
       }
-      console.log(previousUser,"initiator")
 
       if (previousUser === from_user) {
         return res
@@ -250,6 +248,9 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
   }
 };
 
+
+
+
 // for initiate new file
 export const getInitiateFiles = async (
   req: Request,
@@ -261,9 +262,16 @@ export const getInitiateFiles = async (
     if (req.session && req.session.user) {
       uploaded_by = req.session.user.username;
     }
+    const file = req.file;
 
-    const result =
-      await db`INSERT INTO files (id,title,uploaded_by,content) VALUES ( ${id}, ${title},${uploaded_by},${content})`;
+    if (!file) {
+      return res.status(400).json({ error: "File is required" });
+    }
+    const filePath = file.path;
+    const result = await db`
+      INSERT INTO files (id, title, uploaded_by, content, file) 
+      VALUES (${id}, ${title}, ${uploaded_by}, ${content}, ${filePath})
+    `;
 
     res.json({
       message: "File initiated successfully",

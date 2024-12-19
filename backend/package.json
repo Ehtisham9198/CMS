@@ -15,6 +15,7 @@
     "@types/cookie-parser": "^1.4.8",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
+    "@types/multer": "^1.4.12",
     "@types/pg": "^8.11.10",
     "concurrently": "^9.1.0",
     "typescript": "^5.7.2"
@@ -28,6 +29,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1",
     "pg": "^8.13.1",
     "postgres": "^3.4.5"
   }
