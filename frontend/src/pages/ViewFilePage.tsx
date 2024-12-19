@@ -11,6 +11,7 @@ import { IoEllipsisVertical } from "react-icons/io5";
 import { getActions, getFile } from "../hooks/requests";
 import { useParams } from "react-router-dom";
 import { IFile } from "./Dashboard";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export interface IAction {
   id: string;
@@ -41,9 +42,20 @@ function ViewFilePage() {
   }, []);
 
   return (
-    <div className="sm:p-4 space-y-2">
+    <div className="sm:p-4 space-y-4">
       <h1 className="text-3xl my-4"><span className="text-muted-foreground">#{file?.id}</span> {file?.title}</h1>
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            File content
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>{file?.content}</p>
+        </CardContent>
+      </Card>
 
+      <h2 className="text-2xl my-4">Actions</h2>
       <div className="shadow">
         <Table className="bg-white">
           <TableHeader>

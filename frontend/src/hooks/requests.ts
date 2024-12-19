@@ -67,7 +67,7 @@ export const getFile = async (file_id: string): Promise<IFile | null> => {
         });
         if (!response.ok) return null;
         const data = await response.json();
-        return data.data[0] as IFile;
+        return data.data as IFile;
     } catch (error) {
         console.error("Error fetching files:", error);
         return null;
@@ -86,6 +86,23 @@ export const getActions = async (file_id: string): Promise<IAction[]> => {
         return result.data;
     } catch (error) {
         console.error(error);
+        return [];
+    }
+}
+
+export const getAllDesignations = async (): Promise<{ designation: string }[]> => {
+    try {
+        const response = await fetch(SERVER_URL + '/api/user/designations');
+
+        if (response.ok) {
+            const result = await response.json();
+            // console.log("designations", result.data);
+            return result.data;
+        }
+
+        return [];
+    } catch (err) {
+        console.log(err);
         return [];
     }
 }

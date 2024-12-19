@@ -60,10 +60,18 @@ export const getFiles = async (req: Request, res: Response): Promise<any> => {
 export const getFile = async (req: Request, res: Response): Promise<any> => {
   try {
     const file_id = req.params.id as string;
-    const result = await db`SELECT* FROM files WHERE id = ${file_id}`;
+    const [file] = await db`SELECT* FROM files WHERE id = ${file_id}`;
+
+    if(!file){
+      return res.status(404).json({
+        success: false,
+        error: "file not found.",
+      });
+    }
+
     res.json({
       success: true,
-      data: result,
+      data: file,
     });
   } catch (error) {
     console.error("Error in fetching files:", error);

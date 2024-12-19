@@ -15,10 +15,7 @@ import { logout } from "../hooks/requests";
 import LoginPage from "../pages/login";
 
 export default function Sidebar() {
-  const { session, revalidate } = useContext(sessionContext); 
-  const ses = useSession()
-  const designation = ses?.user?.designation
-  
+  const { session, revalidate } = useContext(sessionContext);
 
   async function handleLogout() {
     const err = await logout();
@@ -54,7 +51,13 @@ export default function Sidebar() {
             src="https://icons.veryicon.com/png/o/miscellaneous/user-avatar/user-avatar-male-5.png"
             alt=""
           />
-          <h3>{session.user.username} <span className="text-xs text-muted-foreground"> ( {designation})</span></h3>
+          <h3>
+            {session.user.username}{" "}
+            <span className="text-xs text-muted-foreground">
+              {" "}
+              {session.user.designation}
+            </span>
+          </h3>
           <DropdownMenu>
             <DropdownMenuTrigger className="ml-auto mr-2">
               <IoEllipsisVertical />
@@ -84,11 +87,6 @@ export default function Sidebar() {
             <IoIosPeople size={20} />
             <span className="text-xs lg:text-base">Users</span>
           </SidebarLink>
-
-          <SidebarLink href="/createdFiles">
-            {/* <AiFillFileText /> */}
-            <span className="text-xs lg:text-base">My Drafted Files</span>
-          </SidebarLink>
         </ul>
       </div>
 
@@ -112,8 +110,8 @@ const SidebarLink = ({
         [
           "flex font-semibold lg:flex-row lg:p-2 lg:border flex-col lg:gap-2 items-center lg:px-5 lg:py-3 rounded ",
           isActive
-            ? "text-black border-black"
-            : "text-black/60 hover:border-rail-dark",
+            ? "text-primary border-primary bg-primary/5"
+            : "text-primary/60",
         ].join(" ")
       }
       to={href}
