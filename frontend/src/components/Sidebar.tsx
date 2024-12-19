@@ -83,7 +83,7 @@ export default function Sidebar() {
             <span className="text-xs lg:text-base">Initiate Files</span>
           </SidebarLink>
 
-          <SidebarLink href="/users">
+          <SidebarLink href="/pdf">
             <IoIosPeople size={20} />
             <span className="text-xs lg:text-base">Users</span>
           </SidebarLink>

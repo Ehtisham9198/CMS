@@ -4,7 +4,8 @@ import cors from "cors";
 import authRouter from "./routes/auth";
 import fileRouter from "./routes/files";
 import session from "cookie-session";
-import userRouter from "./routes/user"
+import userRouter from "./routes/user";
+import path from "path";
 
 const app = express();
 
@@ -31,6 +32,10 @@ app.use("/api/auth", authRouter);
 app.use("/api", fileRouter);
 app.use("/api", userRouter);
 
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(process.cwd(), "..", "frontend", "dist", "index.html"));
+});
 
 
 async function main() {

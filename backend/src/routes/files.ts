@@ -1,6 +1,6 @@
 import { Router } from "express";
 import multer from "multer"
-import { getActions, getEditFile, getFile, getfileById, getFiles, getInitiateFiles, getMyInitiatedFiles, getReceivedFiles, getTrack } from "../controllers/files";
+import { generateFilePDF, getActions, getEditFile, getFile, getfileById, getFiles, getInitiateFiles, getMyInitiatedFiles, getReceivedFiles, getTrack } from "../controllers/files";
 import { isAuthenticated } from "../middlewares/auth";
 const fileRouter = Router();
 const upload = multer({ dest: "uploads/" });
@@ -15,6 +15,7 @@ fileRouter.post('/initiate_file', upload.single("file"), getInitiateFiles);
 fileRouter.get('/ReceivedFiles', getReceivedFiles);
 fileRouter.put('/initiate_file', getEditFile);
 fileRouter.get('/fileById', getfileById);
+fileRouter.get('/files/:id/generate-pdf', generateFilePDF);
 
 
 

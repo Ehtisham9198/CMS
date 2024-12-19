@@ -15,6 +15,7 @@ import ViewFilePage from "./pages/ViewFilePage.tsx";
 import Action from "./components/action.tsx";
 import InitiateFilePage from "./pages/InitiateFilePage.tsx";
 import Forward from "./components/initiateForm.tsx"
+import PdfGeneretor from "./components/generatepdf.tsx"
 
 const router = createBrowserRouter([
   {
@@ -71,6 +72,10 @@ const router = createBrowserRouter([
             path: "/users",
             element: <UsersPage />,
           },
+          {
+            path:"/pdf/:file_id",
+            element:<PdfGeneretor/>
+          }
         ],
       },
     ],

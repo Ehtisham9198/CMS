@@ -1,5 +1,7 @@
 import db from "../configurations/db";
 import { Request, Response } from "express";
+import fs from 'fs';
+import PDFDocument from 'pdfkit'
 
 //  track files
 export const getTrack = async (req: Request, res: Response): Promise<any> => {
@@ -381,3 +383,59 @@ export const getfileById = async (req: Request, res: Response):Promise<any> => {
     }
 };
 
+// Generate pdf
+
+export const generateFilePDF = async (req: Request, res: Response): Promise<any> => {
+  const fileId = req.params.id;
+
+  try {
+    const fileQuery = await db`SELECT * FROM files WHERE id = ${fileId}`;
+    const file = fileQuery[0];
+
+    if (!file) {
+      return res.status(404).json({ error: 'File not found' });
+    }
+
+    const forwardersQuery = await db`SELECT * FROM actions WHERE file_id = ${fileId}`;
+
+    // Initialize PDF document
+    const doc = new PDFDocument();
+    const filePath = `uploads/${file.id}_file_details.pdf`;
+    console.log(filePath, "path");
+
+    const writeStream = fs.createWriteStream(filePath);
+    doc.pipe(writeStream);
+
+    // Add content to the PDF
+    doc.fontSize(16).text(`File Id: ${file.id}`, { underline: true });
+    doc.fontSize(16).text(`File Title: ${file.title}`, { underline: true });
+    doc.fontSize(12).text(`Content: ${file.content}\n\n`);
+
+    doc.fontSize(14).text('Forwarded By:', { underline: true });
+    forwardersQuery.forEach((forwarder) => {
+      doc.fontSize(12).text(`- ${forwarder.from_user}: ${forwarder.remarks}`);
+    });
+
+    // Finalize the PDF
+    doc.end();
+
+    // Wait for the file to be written
+    writeStream.on('finish', () => {
+      res.download(filePath, 'file_details.pdf', (err) => {
+        if (err) {
+          console.error('Error downloading PDF:', err);
+          res.status(500).send('Error downloading PDF');
+        }
+        fs.unlinkSync(filePath); // Clean up after sending
+      });
+    });
+
+    writeStream.on('error', (err) => {
+      console.error('File write error:', err);
+      res.status(500).send('Error generating PDF');
+    });
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    res.status(500).json({ error: 'Error generating PDF' });
+  }
+};
