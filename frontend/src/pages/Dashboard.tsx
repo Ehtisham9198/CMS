@@ -33,9 +33,8 @@ function Dashboard() {
   const [files, setFiles] = useState<IFile[]>([]);
   const [filter, setFilter] = useState<string>("");
   const navigate = useNavigate();
-  const session = useSession()
-  const username = session?.user?.username
-
+  const session = useSession();
+  const username = session?.user?.username;
 
   const filteredList = useMemo(() => {
     const q = filter.toLowerCase();
@@ -51,7 +50,7 @@ function Dashboard() {
     (async () => {
       const files = await getFiles();
       setFiles(files);
-      console.log(files)
+      console.log(files);
     })();
   }, []);
 
@@ -79,7 +78,7 @@ function Dashboard() {
         <Table className="bg-popover">
           <TableHeader>
             <TableRow>
-              <TableHead>File ID</TableHead>
+              <TableHead className="text-nowrap">File ID</TableHead>
               <TableHead>Title</TableHead>
               <TableHead className="text-nowrap">Initiated by</TableHead>
               <TableHead>Created on</TableHead>
@@ -91,8 +90,12 @@ function Dashboard() {
               <TableRow key={file.id}>
                 <TableCell>{file.id}</TableCell>
                 <TableCell className="w-full">{file.title}</TableCell>
-                <TableCell className="text-nowrap">{file.uploaded_by}</TableCell>
-                <TableCell className="text-nowrap">{(new Date(file.created_at)).toDateString()}</TableCell>
+                <TableCell className="text-nowrap">
+                  {file.uploaded_by}
+                </TableCell>
+                <TableCell className="text-nowrap">
+                  {new Date(file.created_at).toDateString()}
+                </TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger className="ml-auto mr-2">
@@ -105,11 +108,15 @@ function Dashboard() {
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => actionHandler(file.id)}>
-                          Take Action
+                        Take Action
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => EditHandler(file.id, file.uploaded_by)}>
-                        {username === file.uploaded_by && "Edit"}
-                      </DropdownMenuItem>
+                      {username === file.uploaded_by && (
+                        <DropdownMenuItem
+                          onClick={() => EditHandler(file.id, file.uploaded_by)}
+                        >
+                          Edit
+                        </DropdownMenuItem>
+                      )}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
