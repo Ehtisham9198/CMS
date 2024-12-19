@@ -28,7 +28,8 @@ const Action = () => {
       setError("All fields must be filled before forwarding.");
       return;
     }
-
+    console.log(fileId,action,forwardTo,remarks,"this is")
+    
     try {
       const response = await fetch("http://localhost:3000/api/file_forward", {
         method: "POST",
@@ -44,7 +45,7 @@ const Action = () => {
         credentials: "include",
       });
       const data = await response.json();
-      console.log(data)
+      console.log(data,"error")
 
       if (response.ok) {
         setError(null); 

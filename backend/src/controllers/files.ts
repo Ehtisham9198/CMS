@@ -88,6 +88,7 @@ export const getMyInitiatedFiles = async (req: Request, res: Response) => {
 export const getActions = async (req: Request, res: Response): Promise<any> => {
   try {
     // finding username
+    console.log("Error in rejection")
     let from_user;
     if (req.session && req.session.user && req.session.user.username) {
       from_user = req.session.user.username;
@@ -96,6 +97,7 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
     }
 
     let { file_id: id, action,remarks, to_users: to_designation} = req.body;
+    console.log(req.body)
 
     if (!id || !action) {
       return res.status(400).json({ error: "Missing required fields" });
@@ -147,6 +149,7 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
                 WHERE  to_users = ${from_user} AND created_at = (SELECT MAX(created_at)FROM actions WHERE file_id = ${id})`;
 
       // Update the previous action to "Forwarded"
+      console.log("Inserted into paths", to_username.username,id)
       await db`INSERT INTO paths(username,file_id) VALUES (${to_username.username},${id})`;
 
       // Insert the new "Pending" action for the receiving user
@@ -160,13 +163,13 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
       });
     }
     if (action === "reject") {
-      let previousUser = await db`
+      let previousUser = (await db`
             SELECT username
             FROM paths
             WHERE file_id = ${id}
             ORDER BY created_at DESC
             OFFSET 1
-            LIMIT 1`;
+            LIMIT 1`)[0]?.username;
 
       await db`DELETE FROM paths
             WHERE file_id = ${id}
@@ -181,6 +184,7 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
             FROM files
             WHERE id = ${id}`)[0]?.uploaded_by;
       }
+      console.log(previousUser,"initiator")
 
       if (previousUser === from_user) {
         return res
@@ -196,7 +200,7 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
       // Insert the new "Pending" action for the receiving user
       const result =
         await db`INSERT INTO actions(from_user, file_id, to_users, action, remarks, title) 
-                                    VALUES (${from_user}, ${id}, ${previousUser[0].username}, 'Pending', ${remarks}, ${title})`;
+                                    VALUES (${from_user}, ${id}, ${previousUser}, 'Pending', ${remarks}, ${title})`;
 
       return res.status(200).json({
         message: "File forwarded successfully",
@@ -233,6 +237,8 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
     const result =
       await db`INSERT INTO actions(from_user, file_id, to_users, action, remarks, title) 
                                 VALUES (${from_user}, ${id}, ${to_username.username}, ${action}, ${remarks}, ${title})`;
+
+    await db`INSERT INTO paths(username,file_id) VALUES (${to_username.username},${id})`;
 
     res.status(200).json({
       message: "File processed successfully",
@@ -285,7 +291,7 @@ export const getReceivedFiles = async (
 
     // Fetch pending files for the current user
     const result = await db`
-            SELECT files.id as id,files.title AS title,from_user AS forwarded_by,files.uploaded_by AS uploaded_by,files.created_at AS created_at, files.content as content
+            SELECT DISTINCT files.id as id,files.title AS title,from_user AS forwarded_by,files.uploaded_by AS uploaded_by,files.created_at AS created_at, files.content as content
             FROM actions JOIN files ON actions.file_id = files.id
             WHERE actions.to_users = ${my_username} AND actions.action = ${actionState}
         `;

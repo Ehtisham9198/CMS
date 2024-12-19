@@ -51,6 +51,7 @@ function Dashboard() {
     (async () => {
       const files = await getFiles();
       setFiles(files);
+      console.log(files)
     })();
   }, []);
 
