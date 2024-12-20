@@ -4,6 +4,13 @@ import { tryCatch } from "../lib/util";
 
 const SALT_ROUNDS = 10;
 
+type Session = {
+    user: {
+        username: string;
+        designation: string;
+    }
+};
+
 // For creating user
 export const createUser = tryCatch(async (req, res) => {
     const { username, name, email, password, designations } = req.body;
@@ -76,6 +83,21 @@ export const changedPassward = tryCatch(async (req, res) => {
 
 export const getAllDesignations = tryCatch(async (req, res) => {
     const designations = await db`SELECT DISTINCT designation_name AS designation FROM designations `;
+
+    res.json({
+        success: true,
+        data: designations,
+    });
+});
+
+export const getMylDesignations = tryCatch(async (req, res) => {
+    const {user: {username, designation}} = req.session as Session;
+
+    const designations = await db`
+        SELECT DISTINCT designation_name AS designation
+        FROM designations JOIN dtu
+        ON designations.id = dtu.id
+        WHERE dtu.username = ${username}`;
 
     res.json({
         success: true,

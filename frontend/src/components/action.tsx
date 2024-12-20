@@ -72,37 +72,9 @@ const Action = () => {
   }, [file_id]);
 
   return (
-<<<<<<< HEAD
-    <div>
-       <br />
-        <label htmlFor="remarks">Remarks</label> <br />
-        <input
-          type="text"
-          name="remarks"
-          value={remarks}
-          onChange={(e) => setRemarks(e.target.value)}
-        />
-        <br />
-      <form onSubmit={ForwardFileHandler}>       
-        <label htmlFor="action">Action</label>
-        <br />
-        <select
-          name="action"
-          id="action"
-          className="border p-2"
-          value={action}
-          onChange={(e) => setAction(e.target.value)}
-        >
-          <option value="">Select Option</option>
-          <option value="forward">Forward</option>
-          <option value="reject">Reject</option>
-          <option value="complete">Complete</option>
-        </select>
-=======
     <div className="p-2 sm:p-4 space-y-4">
       <h1 className="text-3xl sm:text-4xl sm:mb-4">Send File</h1>
       {error && <p className="text-destructive">{error}</p>}
->>>>>>> b0e8f338d00cbd9ec80b6b99549de5a6545bed7e
 
       <Card className="max-w-2xl">
         <CardHeader>
