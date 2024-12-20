@@ -7,7 +7,7 @@ import db from "../configurations/db";
 export const login = tryCatch(async (req, res) => {
     const { username, password } = req.body;
 
-    if(!username || !password) {
+    if (!username || !password) {
         return res.status(400).json({
             success: false,
             error: "missing required feilds"
@@ -24,12 +24,12 @@ export const login = tryCatch(async (req, res) => {
         });
     }
 
-    const designation = await db `SELECT designations.designation_name FROM designations INNER JOIN dtu ON designations.id = dtu.id WHERE dtu.username = ${username}`;
+    const designation = await db`SELECT designations.designation_name FROM designations INNER JOIN dtu ON designations.id = dtu.id WHERE dtu.username = ${username}`;
     console.log(designation)
-    
+
 
     if (req.session) {
-        req.session.user = { username: username, designation: designation[0].designation_name};
+        req.session.user = { username: username, designation: designation[0].designation_name };
     }
 
     return res.json({
@@ -48,4 +48,35 @@ export const logout = (req: Request, res: Response) => {
 
 export const getSession = tryCatch((req, res) => {
     res.json({ session: req.session });
+});
+
+export const changeDesignation = tryCatch(async (req, res) => {
+    const designation = req.body.designation;
+    // console.log(req.body, req.session);
+
+    if (!designation) {
+        res.status(400).json({
+            success: false,
+            error: "designation not provided",
+        });
+    }
+
+    const designations = await db`
+        SELECT DISTINCT designation_name
+        FROM designations JOIN dtu
+        ON designations.id = dtu.id
+        WHERE dtu.username = ${req.session?.user.username} AND designations.designation_name = ${designation};` as any[];
+
+    if (designations.length <= 0) {
+        res.status(404).json({
+            success: false,
+            error: "designation not found",
+        });
+    }
+
+    if (req.session) {
+        req.session.user.designation = designation;
+    }
+
+    res.json({ success: true });
 });
