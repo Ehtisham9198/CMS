@@ -2,10 +2,11 @@ import { SERVER_URL } from '@/hooks/requests';
 import React, { useState } from 'react';
 import { useLocation, useParams } from "react-router-dom";
 
-const FileDetails = () => {
+const FileDetails = ({fileId}: {fileId: string}) => {
 
   const [loading, setLoading] = useState(false);
-  const { file_id:fileId } = useParams();
+  console.log(fileId)
+
 
   const handleDownloadPDF = async () => {
     setLoading(true);
@@ -33,11 +34,9 @@ const FileDetails = () => {
   };
 
   return (
-    <div>
       <button onClick={handleDownloadPDF} disabled={loading}>
-        {loading ? 'Generating PDF...' : 'Download File Details as PDF'}
+        {loading ? 'Generating PDF...' : 'View as pdf'}
       </button>
-    </div>
   );
 };
 

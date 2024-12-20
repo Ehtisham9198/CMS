@@ -72,10 +72,7 @@ const router = createBrowserRouter([
             path: "/users",
             element: <UsersPage />,
           },
-          {
-            path:"/pdf/:file_id",
-            element:<PdfGeneretor/>
-          }
+
         ],
       },
     ],

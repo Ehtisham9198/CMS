@@ -277,7 +277,7 @@ export const getInitiateFiles = async (
     if (!file) {
       return res.status(400).json({ error: "File is required" });
     }
-    const filePath = file.path;
+    const filePath =file.path;
     const result = await db`
       INSERT INTO files (id, title, uploaded_by, content, file) 
       VALUES (${id}, ${title}, ${uploaded_by}, ${content}, ${filePath})
@@ -383,7 +383,8 @@ export const getfileById = async (req: Request, res: Response):Promise<any> => {
     }
 };
 
-// Generate pdf
+
+
 
 export const generateFilePDF = async (req: Request, res: Response): Promise<any> => {
   const fileId = req.params.id;
@@ -397,26 +398,94 @@ export const generateFilePDF = async (req: Request, res: Response): Promise<any>
     }
 
     const forwardersQuery = await db`SELECT * FROM actions WHERE file_id = ${fileId}`;
-
+  
     // Initialize PDF document
-    const doc = new PDFDocument();
+    const doc = new PDFDocument({ margin: 40 });
     const filePath = `uploads/${file.id}_file_details.pdf`;
-    console.log(filePath, "path");
 
     const writeStream = fs.createWriteStream(filePath);
     doc.pipe(writeStream);
 
-    // Add content to the PDF
-    doc.fontSize(16).text(`File Id: ${file.id}`, { underline: true });
-    doc.fontSize(16).text(`File Title: ${file.title}`, { underline: true });
-    doc.fontSize(12).text(`Content: ${file.content}\n\n`);
+    // Add header
+    doc
+      .fontSize(18)
+      .font('Helvetica-Bold')
+      .text('File Details Report', { align: 'center', underline: true })
+      .moveDown(1);
 
-    doc.fontSize(14).text('Forwarded By:', { underline: true });
-    forwardersQuery.forEach((forwarder) => {
-      doc.fontSize(12).text(`- ${forwarder.from_user}: ${forwarder.remarks}`);
-    });
+    // Add file details
+    doc
+      .fontSize(10)
+      .font('Helvetica-Bold')
+      .text(`Date:`, { continued: true })
+      .font('Helvetica')
+      .text(` ${file.created_at.toLocaleDateString() }`)
+      .moveDown(0.5);
+    doc
+      .fontSize(10)
+      .font('Helvetica-Bold')
+      .text(`File ID:`, { continued: true })
+      .font('Helvetica')
+      .text(` ${file.id}`)
+      .moveDown(0.5);
 
-    // Finalize the PDF
+    doc
+      .fontSize(10)
+      .font('Helvetica-Bold')
+      .text(`File Title:`, { continued: true })
+      .font('Helvetica')
+      .text(` ${file.title}`)
+      .moveDown(0.5);
+
+    doc
+      .font('Helvetica-Bold')
+      .text(``, { continued: true })
+      .font('Helvetica')
+      .text(` ${file.content}`)
+      .moveDown(1.5);
+
+    // Add forwarders details
+    doc
+      .fontSize(14)
+      .font('Helvetica-Bold')
+      .text('Action Details', { underline: true })
+      .moveDown(1);
+      const leftWidth = 250; // Reserved width for the left column
+      const rightX = doc.page.width - leftWidth - 40; // Position for the right column
+      
+      for (const forwarder of forwardersQuery) {
+          const senderDesignation = await db`SELECT designation FROM users WHERE username = ${forwarder.from_user}`;
+          const receiverDesignation = await db`SELECT designation FROM users WHERE username = ${forwarder.to_users}`;
+          // Use senderDesignation and receiverDesignation in your logic here
+     
+      
+      
+  // Left side: Forwarded By, Remarks, and Date
+  doc
+    .fontSize(10)
+    .font('Helvetica')
+    .text(`Forwarded By: ${senderDesignation[0].designation}`, 40, doc.y, { width: leftWidth, align: 'left' });
+
+
+  doc
+    .text(`Date: ${forwarder.created_at ? new Date(forwarder.created_at).toLocaleDateString() : 'Invalid Date'}`, 40, doc.y, { width: leftWidth, align: 'left' }) // Increased spacing here
+    .moveDown(5);
+
+  // Right side: Forwarded To
+  const y = doc.y - 80; // Align the right content with the top of the left column
+  doc
+    .fontSize(10)
+    .font('Helvetica')
+    .text(`Forwarded To: ${receiverDesignation[0].designation}`, rightX, y, { width: leftWidth, align: 'left' })
+
+
+    doc
+    .text(`Remarks: ${forwarder.remarks || 'N/A'}`, rightX, y+10, { width: leftWidth, align: 'left' })// Increased spacing here
+    .moveDown(2);
+
+};
+
+
     doc.end();
 
     // Wait for the file to be written
