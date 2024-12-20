@@ -11,13 +11,12 @@ const Action = () => {
   const [id, setId] = useState<string>("");
   const [forwardTo, setForwardTo] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-    const [remarks, setRemarks] = useState<string>("");
+  const [remarks, setRemarks] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
 
   const location = useLocation();
   const state = location.state as LocationState; 
   const fileId = state?.id;
-  console.log(fileId)
 
 
   const ForwardFileHandler = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -28,7 +27,6 @@ const Action = () => {
       setError("All fields must be filled before forwarding.");
       return;
     }
-    console.log(fileId,action,forwardTo,remarks,"this is")
     
     try {
       const response = await fetch("http://localhost:3000/api/file_forward", {

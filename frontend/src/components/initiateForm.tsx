@@ -90,7 +90,7 @@ const CreatedFiles = () => {
       <Card className="max-w-2xl">
         <CardHeader>
           <CardTitle>
-            <span className="text-muted-foreground">#{file?.id} </span>
+            <span className="text-muted-foreground">{file?.id} </span>
             <span className="capitalize">{file?.title}</span>
           </CardTitle>
         </CardHeader>

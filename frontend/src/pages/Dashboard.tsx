@@ -20,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
 import { useSession } from "@/context/Session";
+import FileDetails from "@/components/generatepdf";
 
 export interface IFile {
   id: string;
@@ -57,6 +58,7 @@ function Dashboard() {
   const actionHandler = (id: string) => {
     navigate(`/action`, { state: { id } });
   };
+
 
   const EditHandler = (id: string, uploadedBy: string) => {
     if (username === uploadedBy) {
@@ -117,6 +119,12 @@ function Dashboard() {
                           Edit
                         </DropdownMenuItem>
                       )}
+
+                      <DropdownMenuItem>
+                         <FileDetails fileId = {file.id}/>
+                      </DropdownMenuItem>
+                      
+
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>

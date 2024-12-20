@@ -88,11 +88,6 @@ export default function Sidebar() {
             <GoFileDirectoryFill size={20} />
             <span className="text-xs lg:text-base">My Drafts</span>
           </SidebarLink>
-
-          <SidebarLink href="/users">
-            <IoIosPeople size={20} />
-            <span className="text-xs lg:text-base">Users</span>
-          </SidebarLink>
         </ul>
       </div>
 
