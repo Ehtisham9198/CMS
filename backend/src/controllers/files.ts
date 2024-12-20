@@ -128,9 +128,9 @@ export const getReceivedFiles = async (
   res: Response
 ): Promise<any> => {
   try {
-    let my_username;
+    let my_designation;
     if (req.session && req.session.user && req.session.user.username) {
-      my_username = req.session.user.username;
+      my_designation = req.session.user.designation;
     } else {
       return res.status(400).json({ error: "User not logged in" });
     }
@@ -141,7 +141,7 @@ export const getReceivedFiles = async (
     const result = await db`
             SELECT DISTINCT files.id as id,files.title AS title,from_user AS forwarded_by,files.uploaded_by AS uploaded_by,files.created_at AS created_at, actions.action as status
             FROM actions JOIN files ON actions.file_id = files.id
-            WHERE actions.to_user = ${my_username} AND ( actions.action = ${actionState} OR actions.action = 'Completed')
+            WHERE actions.to_user = ${my_designation} AND ( actions.action = ${actionState} OR actions.action = 'Completed')
         `;
 
     if (!result || result.length === 0) {

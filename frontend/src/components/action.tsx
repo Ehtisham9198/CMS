@@ -9,7 +9,7 @@ import { IFile } from "@/pages/Dashboard";
 
 const defaultData = {
   remarks: "",
-  to_users: "",
+  to_user: "",
   action: "",
 };
 
@@ -26,8 +26,8 @@ const Action = () => {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    if (!file_id || !data.action || (!data.to_users && data.action === "forward")) {
-      console.log("All fields must be filled", file_id, data.action, data.to_users);
+    if (!file_id || !data.action || (!data.to_user && data.action === "forward")) {
+      console.log("All fields must be filled", file_id, data.action, data.to_user);
       setError("All fields must be filled before forwarding.");
       return;
     }
@@ -42,7 +42,7 @@ const Action = () => {
         body: JSON.stringify({
           file_id,
           action: data.action,
-          to_users: data.to_users,
+          to_user: data.to_user,
           remarks: data.remarks,
         }),
         credentials: "include",
@@ -128,9 +128,9 @@ const Action = () => {
 
           <Select
             onValueChange={(val) =>
-              setData((prev) => ({ ...prev, to_users: val }))
+              setData((prev) => ({ ...prev, to_user: val }))
             }
-            value={data.to_users}
+            value={data.to_user}
           >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Designation" />

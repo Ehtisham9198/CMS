@@ -75,7 +75,7 @@ export const generateFilePDF = async (req: Request, res: Response): Promise<any>
         for (const forwarder of forwardersQuery) {
             const senderDesignation = await db`SELECT designations.designation_name FROM designations INNER JOIN dtu ON designations.id = dtu.id WHERE dtu.username = ${forwarder.from_user}`;
             const receiverDesignation = await db`SELECT designations.designation_name FROM designations INNER JOIN dtu ON designations.id = dtu.id WHERE dtu.username = ${forwarder.to_user}`;
-            // Use senderDesignation and receiverDesignation in your logic here
+           console.log(senderDesignation,receiverDesignation,"for pdf")
        
         
         
