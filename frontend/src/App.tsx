@@ -39,10 +39,6 @@ const router = createBrowserRouter([
         element: <Link to="/dashboard">Dashboard</Link>,
       },
       {
-        path: "/action",
-        element: <Action/>,
-      },
-      {
         path: "/",
         element: (
           <Sidebar />
