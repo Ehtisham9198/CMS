@@ -84,6 +84,9 @@ export const generateFilePDF = async (req: Request, res: Response): Promise<any>
   
     doc
       .text(`Date: ${forwarder.created_at ? new Date(forwarder.created_at).toLocaleDateString() : 'Invalid Date'}`, 40, doc.y, { width: leftWidth, align: 'left' }) // Increased spacing here
+  
+    doc
+      .text(`Action: ${forwarder.action}`, 40, doc.y, { width: leftWidth, align: 'left' }) // Increased spacing here
       .moveDown(5);
   
     // Right side: Forwarded To
