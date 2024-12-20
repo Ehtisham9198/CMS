@@ -55,7 +55,7 @@ function Dashboard() {
       setFiles(files);
       console.log(files);
     })();
-  }, []);
+  }, [session?.user?.designation]);
 
   const actionHandler = (id: string) => {
     navigate(`/action`, { state: { id } });

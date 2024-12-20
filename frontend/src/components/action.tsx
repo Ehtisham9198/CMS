@@ -104,7 +104,7 @@ const Action = () => {
             value={data.action}
           >
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Designation" />
+              <SelectValue placeholder="Select Action" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem className="text-blue-500 focus:bg-blue-500 focus:text-blue-50" value="forward">

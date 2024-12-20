@@ -13,10 +13,13 @@ import { Link } from "react-router-dom";
 import { IFile } from "./Dashboard";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { SERVER_URL } from "@/hooks/requests";
+import { useSession } from "@/context/Session";
 
 function MyDrafts() {
   const [files, setFiles] = useState<IFile[]>([]);
   const [error, setError] = useState<string | null>(null);
+
+  const session = useSession();
 
   useEffect(() => {
     const getFiles = async () => {
@@ -41,7 +44,7 @@ function MyDrafts() {
     };
 
     getFiles();
-  }, []);
+  }, [session?.user?.designation]);
 
   return (
     <div className="sm:p-4 space-y-2">
