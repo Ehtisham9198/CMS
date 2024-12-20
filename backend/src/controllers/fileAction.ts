@@ -58,13 +58,14 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
         });
       }
       if (action === "reject") {
+
         let previousUser = (await db`
               SELECT designation
               FROM paths
               WHERE file_id = ${id}
               ORDER BY created_at DESC
               OFFSET 1
-              LIMIT 1`)[0]?.username;
+              LIMIT 1`)[0]?.designation;
   
         await db`DELETE FROM paths
               WHERE file_id = ${id}
@@ -113,7 +114,7 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
               WHERE file_id = ${id}
               ORDER BY created_at DESC
               OFFSET 1
-              LIMIT 1`)[0]?.username;
+              LIMIT 1`)[0]?.designation;
   
         await db`DELETE FROM paths
               WHERE file_id = ${id}
@@ -158,36 +159,19 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
       if (action === "Send") {
         action = "Pending";
       }
-  
-      // Fetching the username of the user with the specified designation
-      const result2 =
-        await db`SELECT dtu.username FROM dtu INNER JOIN designations ON designations.id = dtu.id WHERE designations.designation_name  = ${to_designation}`;
-      if (!result2 || !result2.length) {
-        return res
-          .status(404)
-          .json({ error: "No users found with the specified designation" });
-      }
-  
-      const to_username = result2[0];
-      if (to_username.username === from_user) {
+
+      if (to_designation === from_user) {
         return res
           .status(400)
           .json({ error: "You cannot send files to yourself" });
       }
   
-      // Check if both to_username and title are defined
-      if (!to_username.username ) {
-        return res.status(400).json({ error: "Invalid data found for the file" });
-      }
-  
+
       const result =
         await db`INSERT INTO actions(from_user, file_id, to_user, action, remarks) 
-                                  VALUES (${from_user}, ${id}, ${to_username.username}, ${action}, ${remarks})`;
-
-      const designation = await db `SELECT designations.designation_name FROM designations INNER JOIN dtu ON designations.id = dtu.id WHERE dtu.username = ${to_username.username}`;
-      console.log(designation)
+                                  VALUES (${from_user}, ${id}, ${to_designation}, ${action}, ${remarks})`; 
   
-      await db`INSERT INTO paths(designation, file_id) VALUES (${designation[0].designation_name}, ${id})`
+        await db`INSERT INTO paths(designation, file_id) VALUES (${to_designation}, ${id})`
 
   
       res.status(200).json({

@@ -71,19 +71,15 @@ export const generateFilePDF = async (req: Request, res: Response): Promise<any>
         .moveDown(1);
         const leftWidth = 250; // Reserved width for the left column
         const rightX = doc.page.width - leftWidth - 40; // Position for the right column
+        console.log(forwardersQuery);
         
-        for (const forwarder of forwardersQuery) {
-            const senderDesignation = await db`SELECT designations.designation_name FROM designations INNER JOIN dtu ON designations.id = dtu.id WHERE dtu.username = ${forwarder.from_user}`;
-            const receiverDesignation = await db`SELECT designations.designation_name FROM designations INNER JOIN dtu ON designations.id = dtu.id WHERE dtu.username = ${forwarder.to_user}`;
-           console.log(senderDesignation,receiverDesignation,"for pdf")
-       
-        
+        for (const forwarder of forwardersQuery) {        
         
     // Left side: Forwarded By, Remarks, and Date
     doc
       .fontSize(10)
       .font('Helvetica')
-      .text(`Forwarded By: ${senderDesignation[0].designation}`, 40, doc.y, { width: leftWidth, align: 'left' });
+      .text(`Forwarded By: ${forwarder.from_user}`, 40, doc.y, { width: leftWidth, align: 'left' });
   
   
     doc
@@ -95,7 +91,7 @@ export const generateFilePDF = async (req: Request, res: Response): Promise<any>
     doc
       .fontSize(10)
       .font('Helvetica')
-      .text(`Forwarded To: ${receiverDesignation[0].designation}`, rightX, y, { width: leftWidth, align: 'left' })
+      .text(`Forwarded To: ${forwarder.to_user}`, rightX, y, { width: leftWidth, align: 'left' })
   
   
       doc

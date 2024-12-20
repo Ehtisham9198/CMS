@@ -43,7 +43,7 @@ export const getFiles = async (req: Request, res: Response): Promise<any> => {
     if (!(req.session && req.session.user)) {
       return res.status(401).json({ error: "Unauthorized access" });
     }
-    const User = req.session.user.username;
+    const User = req.session.user.designation;
     const result = await db`
     SELECT f.id, f.title, f.content, f.created_at
     FROM files f
@@ -97,22 +97,26 @@ export const getInitiateFiles = async (
     const { id, title,content} = req.body;
     let uploaded_by;
     if (req.session && req.session.user) {
-      uploaded_by = req.session.user.username;
+      uploaded_by = req.session.user.designation;
     }
     const file = req.file;
 
     if (!file) {
-      return res.status(400).json({ error: "File is required" });
-    }
-    const filePath =file.path;
     const result = await db`
-      INSERT INTO files (id, title, uploaded_by, content, file) 
-      VALUES (${id}, ${title}, ${uploaded_by}, ${content}, ${filePath})
+      INSERT INTO files (id, title, uploaded_by, content) 
+      VALUES (${id}, ${title}, ${uploaded_by}, ${content})
     `;
+    }else{
+      const filePath =file.path;
+      const result = await db`
+        INSERT INTO files (id, title, uploaded_by, content, file) 
+        VALUES (${id}, ${title}, ${uploaded_by}, ${content}, ${filePath})
+      `;
+    }
+
 
     res.json({
       message: "File initiated successfully",
-      fileData: result[0],
     });
   } catch (error) {
     console.error("Error initiating file:", error);
