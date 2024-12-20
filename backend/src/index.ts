@@ -33,6 +33,10 @@ app.use("/api", fileRouter);
 app.use("/api", userRouter);
 
 
+app.get('/attachments/:id', (req, res) => {
+    res.sendFile(path.join(process.cwd(), "uploads", req.params.id));
+});
+
 app.get('*', (req, res) => {
     res.sendFile(path.join(process.cwd(), "..", "frontend", "dist", "index.html"));
 });

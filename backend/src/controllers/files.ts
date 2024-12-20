@@ -97,8 +97,6 @@ export const getMyInitiatedFiles = async (req: Request, res: Response) => {
 
 export const getActions = async (req: Request, res: Response): Promise<any> => {
   try {
-    // finding username
-    console.log("Error in rejection")
     let from_user;
     if (req.session && req.session.user && req.session.user.username) {
       from_user = req.session.user.username;
@@ -216,6 +214,57 @@ export const getActions = async (req: Request, res: Response): Promise<any> => {
       });
     }
 
+
+    // Completion action
+
+    if (action === "complete") {
+      let previousUser = (await db`
+            SELECT username
+            FROM paths
+            WHERE file_id = ${id}
+            ORDER BY created_at DESC
+            OFFSET 1
+            LIMIT 1`)[0]?.username;
+
+      await db`DELETE FROM paths
+            WHERE file_id = ${id}
+            AND created_at = (
+            SELECT MAX(created_at)
+            FROM paths
+            WHERE file_id = ${id})`;
+
+      if (!previousUser || previousUser.length === 0) {
+        previousUser = (await db`
+            SELECT uploaded_by
+            FROM files
+            WHERE id = ${id}`)[0]?.uploaded_by;
+      }
+
+      if (previousUser === from_user) {
+        return res
+          .status(400)
+          .json({ error: "You cannot send files to yourself" });
+      }
+
+      // Update the previous action to "Forwarded"
+      await db`UPDATE actions 
+                     SET action = 'Completed' 
+                     WHERE  to_users = ${from_user} AND created_at = (SELECT MAX(created_at)FROM actions WHERE file_id = ${id})`;
+
+      // Insert the new "Pending" action for the receiving user
+      const result =
+        await db`INSERT INTO actions(from_user, file_id, to_users, action, remarks, title) 
+                                    VALUES (${from_user}, ${id}, ${previousUser}, 'Completed', ${remarks}, ${title})`;
+
+      return res.status(200).json({
+        message: "File Processed successfully",
+        fileData: result || {},
+      });
+    }
+
+
+
+
     // Initial "Send" action
     if (action === "Send") {
       action = "Pending";
@@ -309,9 +358,9 @@ export const getReceivedFiles = async (
 
     // Fetch pending files for the current user
     const result = await db`
-            SELECT DISTINCT files.id as id,files.title AS title,from_user AS forwarded_by,files.uploaded_by AS uploaded_by,files.created_at AS created_at, files.content as content
+            SELECT DISTINCT files.id as id,files.title AS title,from_user AS forwarded_by,files.uploaded_by AS uploaded_by,files.created_at AS created_at, actions.action as status
             FROM actions JOIN files ON actions.file_id = files.id
-            WHERE actions.to_users = ${my_username} AND actions.action = ${actionState}
+            WHERE actions.to_users = ${my_username} AND ( actions.action = ${actionState} OR actions.action = 'Completed')
         `;
 
     if (!result || result.length === 0) {

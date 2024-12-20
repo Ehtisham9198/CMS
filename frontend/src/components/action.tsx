@@ -82,6 +82,7 @@ const Action = () => {
           <option value="">Select Option</option>
           <option value="forward">Forward</option>
           <option value="reject">Reject</option>
+          <option value="complete">Complete</option>
         </select>
 
         <br />

@@ -28,6 +28,7 @@ export interface IFile {
   content: string;
   uploaded_by: string;
   created_at: string;
+  status: string;
 }
 
 function Dashboard() {
@@ -43,7 +44,8 @@ function Dashboard() {
       (file) =>
         file.title.toLowerCase().includes(q) ||
         file.uploaded_by.toLowerCase().includes(q) ||
-        file.id.toLowerCase().includes(q)
+        file.id.toLowerCase().includes(q) ||
+        file.status.toLowerCase().includes(q)
     );
   }, [filter, files]);
 
@@ -82,6 +84,7 @@ function Dashboard() {
             <TableRow>
               <TableHead className="text-nowrap">File ID</TableHead>
               <TableHead>Title</TableHead>
+              <TableHead>Staus</TableHead>
               <TableHead className="text-nowrap">Initiated by</TableHead>
               <TableHead>Created on</TableHead>
               <TableHead>Action</TableHead>
@@ -92,6 +95,7 @@ function Dashboard() {
               <TableRow key={file.id}>
                 <TableCell>{file.id}</TableCell>
                 <TableCell className="w-full">{file.title}</TableCell>
+                <TableCell>{file.status}</TableCell>
                 <TableCell className="text-nowrap">
                   {file.uploaded_by}
                 </TableCell>
