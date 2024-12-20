@@ -45,12 +45,12 @@ function MyDrafts() {
 
   return (
     <div className="sm:p-4 space-y-2">
+      <div className="p-2 lg:p-4 w-full flex items-center justify-between">
+      <h1 className="text-2xl lg:text-4xl">My Drafts</h1>
       <Button asChild>
-        <Link to="/files/create">Create new</Link>
+        <Link to="/files/create"><span className="text-2xl h-9">+</span> Create new</Link>
       </Button>
-      <br />
-      <br />
-      <h1>Created Files</h1>
+      </div>
 
       <div className="shadow">
         <Table className="bg-white">

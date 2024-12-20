@@ -16,7 +16,7 @@ interface ErrType extends File {
   message?: string;
 }
 
-function InitiateFilePage() {
+function CreateFilePage() {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<ErrType>();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -181,6 +181,11 @@ function InitiateFilePage() {
           {err?.content && <p className="text-destructive">{err.content}</p>}
         </div>
 
+        <div>
+          <label htmlFor="file">Attachments</label>
+          <Input type="file" multiple name="file" />
+        </div>
+
         <Button className="sm:col-span-2" disabled={loading}>
           {loading ? "Pending..." : "Submit"}
         </Button>
@@ -189,4 +194,4 @@ function InitiateFilePage() {
   );
 }
 
-export default InitiateFilePage;
+export default CreateFilePage;

@@ -1,6 +1,7 @@
 import { ReactNode, useContext } from "react";
 import { RiDashboardFill } from "react-icons/ri";
 import { GoFileDirectoryFill } from "react-icons/go";
+import { SiQuicklook } from "react-icons/si";
 import { NavLink, Outlet } from "react-router-dom";
 import { IoIosPeople } from "react-icons/io";
 import { sessionContext, useSession } from "../context/Session";
@@ -78,9 +79,14 @@ export default function Sidebar() {
             <span className="text-xs lg:text-base">Dashboard</span>
           </SidebarLink>
 
+          <SidebarLink href="/track">
+            <SiQuicklook size={20} />
+            <span className="text-xs lg:text-base">Track Files</span>
+          </SidebarLink>
+
           <SidebarLink href="/files">
             <GoFileDirectoryFill size={20} />
-            <span className="text-xs lg:text-base">Initiate Files</span>
+            <span className="text-xs lg:text-base">My Drafts</span>
           </SidebarLink>
 
           <SidebarLink href="/users">
