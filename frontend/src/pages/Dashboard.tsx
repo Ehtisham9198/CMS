@@ -25,7 +25,7 @@ import FileDetails from "@/components/generatepdf";
 export interface IFile {
   id: string;
   title: string;
-  content?: string;
+  content: string;
   uploaded_by: string;
   created_at: string;
 }

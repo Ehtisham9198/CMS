@@ -6,13 +6,13 @@ import React, { FormEvent, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { IFile } from "./Dashboard";
 
-type File = {
+interface IFormData {
   id?: string;
   title?: string;
   content?: string;
-};
+}
 
-interface ErrType extends File {
+interface ErrType extends IFormData {
   message?: string;
 }
 
@@ -56,31 +56,22 @@ function CreateFilePage() {
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    let err: File = {
-      id: undefined,
-      title: undefined,
-      content: undefined,
-    };
+    let err: ErrType = {};
 
-    const data = Object.fromEntries(
-      new FormData(e.currentTarget).entries()
-    ) as File;
+    const formData = new FormData(e.currentTarget);
 
-    // Extra check
-    if (file?.id) {
-      data.id = file.id;
-    } else {
-      data.id = data.id?.trim();
+    if(file?.id) {
+      formData.append("id", file.id);
     }
+    err.id = validFileId(formData.get("id")?.toString());
 
-    data.title = data.title?.trim();
-    data.content = data.content?.trim();
-
-    err.id = validFileId(data.id);
-    if (!data.title) {
+    if (!formData.get("id")) {
+      err.id = "id cannot be empty";
+    }
+    if (!formData.get("title")) {
       err.title = "title cannot be empty";
     }
-    if (!data.content) {
+    if (!formData.get("content")) {
       err.content = "content cannot be empty";
     }
 
@@ -96,10 +87,7 @@ function CreateFilePage() {
     try {
       const response = await fetch(SERVER_URL + "/api/initiate_file", {
         method: file && file.id ? "PUT" : "POST",
-        body: JSON.stringify(data),
-        headers: {
-          "Content-Type": "application/json",
-        },
+        body: formData,
         credentials: "include",
       });
 
@@ -133,12 +121,6 @@ function CreateFilePage() {
         className="p-2 gap-4 grid sm:grid-cols-2 max-w-2xl"
         onSubmit={handleSubmit}
       >
-        {file?.id ? (
-          <div className="space-y-1">
-            <span>File ID:</span>
-            <h3 className="text-lg ml-2 font-semibold">{file.id}</h3>
-          </div>
-        ) : (
           <div className="space-y-1">
             <label htmlFor="id">
               File ID<span className="text-red-500">*</span>
@@ -149,10 +131,11 @@ function CreateFilePage() {
               name="id"
               placeholder="file id..."
               required
+              disabled={!!file?.id}
+              defaultValue={file?.id}
             />
             {err?.id && <p className="text-destructive">{err.id}</p>}
           </div>
-        )}
         <div className="space-y-1">
           <label htmlFor="title">
             Title<span className="text-red-500">*</span>
