@@ -1,7 +1,9 @@
 import { Router } from "express";
 import multer from "multer";
-import { generateFilePDF, getActions, getEditFile, getFile, getfileById, getFiles, getInitiateFiles, getMyInitiatedFiles, getReceivedFiles, getTrack } from "../controllers/files";
+import {getEditFile, getFile, getfileById, getFiles, getInitiateFiles, getReceivedFiles, getTrack } from "../controllers/files";
 import { isAuthenticated } from "../middlewares/auth";
+import { getActions } from "../controllers/fileaction";
+import { generateFilePDF } from "../controllers/generatePDF";
 const fileRouter = Router();
 const upload = multer({ dest: "uploads/" });
 
@@ -9,7 +11,6 @@ const upload = multer({ dest: "uploads/" });
 fileRouter.get('/track/:id', getTrack);
 fileRouter.get('/get_files', getFiles);
 fileRouter.get('/file/:id', isAuthenticated, getFile);
-fileRouter.get('/MyInitiatesFiles', getMyInitiatedFiles);  //lagana h isko
 fileRouter.post('/file_forward', getActions);
 fileRouter.post('/initiate_file', upload.single("file"), getInitiateFiles);
 fileRouter.get('/ReceivedFiles', getReceivedFiles);

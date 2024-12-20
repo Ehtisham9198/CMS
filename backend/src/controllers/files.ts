@@ -1,7 +1,7 @@
 import db from "../configurations/db";
 import { Request, Response } from "express";
-import fs from 'fs';
-import PDFDocument from 'pdfkit'
+
+
 
 //  track files
 export const getTrack = async (req: Request, res: Response): Promise<any> => {
@@ -12,7 +12,7 @@ export const getTrack = async (req: Request, res: Response): Promise<any> => {
 
   try {
     const result =
-      await db`SELECT id, to_users as to_user, from_user, remarks, created_at 
+      await db`SELECT id, to_user as to_user, from_user, remarks, created_at 
                                 FROM actions 
                                 WHERE file_id = ${file_id} 
                                 ORDER BY created_at`;
@@ -33,6 +33,9 @@ export const getTrack = async (req: Request, res: Response): Promise<any> => {
       .json({ error: "Error fetching tracking information for the file" });
   }
 };
+
+
+
 
 // get files for logged in user
 export const getFiles = async (req: Request, res: Response): Promise<any> => {
@@ -58,6 +61,9 @@ export const getFiles = async (req: Request, res: Response): Promise<any> => {
   }
 };
 
+
+
+
 // get file by id
 export const getFile = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -80,234 +86,6 @@ export const getFile = async (req: Request, res: Response): Promise<any> => {
     res.status(500).json({ error: "Error in fetching files" });
   }
 };
-
-// for fetch My initiated files
-export const getMyInitiatedFiles = async (req: Request, res: Response) => {
-  let my_name;
-  if (req.session && req.session.user && req.session.user.username) {
-    my_name = req.session.user.username;
-  }
-  const result =
-    await db`SELECT id,uploaded_by,title,created_at FROM files WHERE uploaded_by =${my_name}`;
-  res.json({
-    message: "File processed successfully",
-    fileData: result || {},
-  });
-};
-
-export const getActions = async (req: Request, res: Response): Promise<any> => {
-  try {
-    let from_user;
-    if (req.session && req.session.user && req.session.user.username) {
-      from_user = req.session.user.username;
-    } else {
-      return res.status(400).json({ error: "User not logged in" });
-    }
-
-    let { file_id: id, action,remarks, to_users: to_designation} = req.body;
-
-    if (!id || !action) {
-      return res.status(400).json({ error: "Missing required fields" });
-    }
-
-    // Check if file exists
-    const check =
-      await db`SELECT COUNT(*) AS count FROM files WHERE id = ${id}`;
-    if (!check || !check.length || check[0].count === 0) {
-      return res.status(404).json({ error: "No files found for this id" });
-    }
-
-    // Fetch file title
-    const result1 = await db`SELECT title FROM files WHERE id = ${id}`;
-    if (!result1 || !result1.length) {
-      return res.status(404).json({ error: "No files found for the user" });
-    }
-
-    const { title } = result1[0];
-
-    // If the action is "forward," update the previous entry and create a new one
-    if (action === "forward") {
-      // Fetching the username of the user with the specified designation
-      const result2 =
-        await db`SELECT username FROM users WHERE designation = ${to_designation}`;
-      if (!result2 || !result2.length) {
-        return res
-          .status(404)
-          .json({ error: "No users found with the specified designation" });
-      }
-
-      const to_username = result2[0];
-      if (to_username.username === from_user) {
-        return res
-          .status(400)
-          .json({ error: "You cannot send files to yourself" });
-      }
-
-      // Check if both to_username and title are defined
-      if (!to_username.username || !title) {
-        return res
-          .status(400)
-          .json({ error: "Invalid data found for the file" });
-      }
-
-      // Update the previous action to "Forwarded"
-      await db`UPDATE actions 
-                SET action = 'Forwarded' 
-                WHERE  to_users = ${from_user} AND created_at = (SELECT MAX(created_at)FROM actions WHERE file_id = ${id})`;
-
-      // Update the previous action to "Forwarded"
-      console.log("Inserted into paths", to_username.username,id)
-      await db`INSERT INTO paths(username,file_id) VALUES (${to_username.username},${id})`;
-
-      // Insert the new "Pending" action for the receiving user
-      const result =
-        await db`INSERT INTO actions(from_user, file_id, to_users, action, remarks, title) 
-                                    VALUES (${from_user}, ${id}, ${to_username.username}, 'Pending', ${remarks}, ${title})`;
-
-      return res.status(200).json({
-        message: "File forwarded successfully",
-        fileData: result || {},
-      });
-    }
-    if (action === "reject") {
-      let previousUser = (await db`
-            SELECT username
-            FROM paths
-            WHERE file_id = ${id}
-            ORDER BY created_at DESC
-            OFFSET 1
-            LIMIT 1`)[0]?.username;
-
-      await db`DELETE FROM paths
-            WHERE file_id = ${id}
-            AND created_at = (
-            SELECT MAX(created_at)
-            FROM paths
-            WHERE file_id = ${id})`;
-
-      if (!previousUser || previousUser.length === 0) {
-        previousUser = (await db`
-            SELECT uploaded_by
-            FROM files
-            WHERE id = ${id}`)[0]?.uploaded_by;
-      }
-
-      if (previousUser === from_user) {
-        return res
-          .status(400)
-          .json({ error: "You cannot send files to yourself" });
-      }
-
-      // Update the previous action to "Forwarded"
-      await db`UPDATE actions 
-                     SET action = 'Rejected' 
-                     WHERE  to_users = ${from_user} AND created_at = (SELECT MAX(created_at)FROM actions WHERE file_id = ${id})`;
-
-      // Insert the new "Pending" action for the receiving user
-      const result =
-        await db`INSERT INTO actions(from_user, file_id, to_users, action, remarks, title) 
-                                    VALUES (${from_user}, ${id}, ${previousUser}, 'Pending', ${remarks}, ${title})`;
-
-      return res.status(200).json({
-        message: "File forwarded successfully",
-        fileData: result || {},
-      });
-    }
-
-
-    // Completion action
-
-    if (action === "complete") {
-      let previousUser = (await db`
-            SELECT username
-            FROM paths
-            WHERE file_id = ${id}
-            ORDER BY created_at DESC
-            OFFSET 1
-            LIMIT 1`)[0]?.username;
-
-      await db`DELETE FROM paths
-            WHERE file_id = ${id}
-            AND created_at = (
-            SELECT MAX(created_at)
-            FROM paths
-            WHERE file_id = ${id})`;
-
-      if (!previousUser || previousUser.length === 0) {
-        previousUser = (await db`
-            SELECT uploaded_by
-            FROM files
-            WHERE id = ${id}`)[0]?.uploaded_by;
-      }
-
-      if (previousUser === from_user) {
-        return res
-          .status(400)
-          .json({ error: "You cannot send files to yourself" });
-      }
-
-      // Update the previous action to "Forwarded"
-      await db`UPDATE actions 
-                     SET action = 'Completed' 
-                     WHERE  to_users = ${from_user} AND created_at = (SELECT MAX(created_at)FROM actions WHERE file_id = ${id})`;
-
-      // Insert the new "Pending" action for the receiving user
-      const result =
-        await db`INSERT INTO actions(from_user, file_id, to_users, action, remarks, title) 
-                                    VALUES (${from_user}, ${id}, ${previousUser}, 'Completed', ${remarks}, ${title})`;
-
-      return res.status(200).json({
-        message: "File Processed successfully",
-        fileData: result || {},
-      });
-    }
-
-
-
-
-    // Initial "Send" action
-    if (action === "Send") {
-      action = "Pending";
-    }
-
-    // Fetching the username of the user with the specified designation
-    const result2 =
-      await db`SELECT username FROM users WHERE designation = ${to_designation}`;
-    if (!result2 || !result2.length) {
-      return res
-        .status(404)
-        .json({ error: "No users found with the specified designation" });
-    }
-
-    const to_username = result2[0];
-    if (to_username.username === from_user) {
-      return res
-        .status(400)
-        .json({ error: "You cannot send files to yourself" });
-    }
-
-    // Check if both to_username and title are defined
-    if (!to_username.username || !title) {
-      return res.status(400).json({ error: "Invalid data found for the file" });
-    }
-
-    const result =
-      await db`INSERT INTO actions(from_user, file_id, to_users, action, remarks, title) 
-                                VALUES (${from_user}, ${id}, ${to_username.username}, ${action}, ${remarks}, ${title})`;
-
-    await db`INSERT INTO paths(username,file_id) VALUES (${to_username.username},${id})`;
-
-    res.status(200).json({
-      message: "File processed successfully",
-      fileData: result || {},
-    });
-  } catch (error) {
-    console.error("Error in processing file:", error);
-    res.status(500).json({ error: "Error in processing file" });
-  }
-};
-
-
 
 
 // for initiate new file
@@ -342,6 +120,9 @@ export const getInitiateFiles = async (
   }
 };
 
+
+
+
 export const getReceivedFiles = async (
   req: Request,
   res: Response
@@ -360,7 +141,7 @@ export const getReceivedFiles = async (
     const result = await db`
             SELECT DISTINCT files.id as id,files.title AS title,from_user AS forwarded_by,files.uploaded_by AS uploaded_by,files.created_at AS created_at, actions.action as status
             FROM actions JOIN files ON actions.file_id = files.id
-            WHERE actions.to_users = ${my_username} AND ( actions.action = ${actionState} OR actions.action = 'Completed')
+            WHERE actions.to_user = ${my_username} AND ( actions.action = ${actionState} OR actions.action = 'Completed')
         `;
 
     if (!result || result.length === 0) {
@@ -381,6 +162,8 @@ export const getReceivedFiles = async (
 };
 
 
+
+
 export const getEditFile =async(req:Request,res:Response): Promise<any>=>{
 try{
  const {id,title,content} = req.body
@@ -396,10 +179,9 @@ try{
 {
     res.status(500).json({error: 'Error in Editing'})
 }
-
-
-
 }
+
+
 
 
 
@@ -430,130 +212,4 @@ export const getfileById = async (req: Request, res: Response):Promise<any> => {
       console.error("Error in fetching files:", error);
       res.status(500).json({ error: "Error in fetching files" }); 
     }
-};
-
-
-
-
-export const generateFilePDF = async (req: Request, res: Response): Promise<any> => {
-  const fileId = req.params.id;
-
-  try {
-    const fileQuery = await db`SELECT * FROM files WHERE id = ${fileId}`;
-    const file = fileQuery[0];
-
-    if (!file) {
-      return res.status(404).json({ error: 'File not found' });
-    }
-
-    const forwardersQuery = await db`SELECT * FROM actions WHERE file_id = ${fileId}`;
-  
-    // Initialize PDF document
-    const doc = new PDFDocument({ margin: 40 });
-    const filePath = `uploads/${file.id}_file_details.pdf`;
-
-    const writeStream = fs.createWriteStream(filePath);
-    doc.pipe(writeStream);
-
-    // Add header
-    doc
-      .fontSize(18)
-      .font('Helvetica-Bold')
-      .text('File Details Report', { align: 'center', underline: true })
-      .moveDown(1);
-
-    // Add file details
-    doc
-      .fontSize(10)
-      .font('Helvetica-Bold')
-      .text(`Date:`, { continued: true })
-      .font('Helvetica')
-      .text(` ${file.created_at.toLocaleDateString() }`)
-      .moveDown(0.5);
-    doc
-      .fontSize(10)
-      .font('Helvetica-Bold')
-      .text(`File ID:`, { continued: true })
-      .font('Helvetica')
-      .text(` ${file.id}`)
-      .moveDown(0.5);
-
-    doc
-      .fontSize(10)
-      .font('Helvetica-Bold')
-      .text(`File Title:`, { continued: true })
-      .font('Helvetica')
-      .text(` ${file.title}`)
-      .moveDown(0.5);
-
-    doc
-      .font('Helvetica-Bold')
-      .text(``, { continued: true })
-      .font('Helvetica')
-      .text(` ${file.content}`)
-      .moveDown(1.5);
-
-    // Add forwarders details
-    doc
-      .fontSize(14)
-      .font('Helvetica-Bold')
-      .text('Action Details', { underline: true })
-      .moveDown(1);
-      const leftWidth = 250; // Reserved width for the left column
-      const rightX = doc.page.width - leftWidth - 40; // Position for the right column
-      
-      for (const forwarder of forwardersQuery) {
-          const senderDesignation = await db`SELECT designation FROM users WHERE username = ${forwarder.from_user}`;
-          const receiverDesignation = await db`SELECT designation FROM users WHERE username = ${forwarder.to_users}`;
-          // Use senderDesignation and receiverDesignation in your logic here
-     
-      
-      
-  // Left side: Forwarded By, Remarks, and Date
-  doc
-    .fontSize(10)
-    .font('Helvetica')
-    .text(`Forwarded By: ${senderDesignation[0].designation}`, 40, doc.y, { width: leftWidth, align: 'left' });
-
-
-  doc
-    .text(`Date: ${forwarder.created_at ? new Date(forwarder.created_at).toLocaleDateString() : 'Invalid Date'}`, 40, doc.y, { width: leftWidth, align: 'left' }) // Increased spacing here
-    .moveDown(5);
-
-  // Right side: Forwarded To
-  const y = doc.y - 80; // Align the right content with the top of the left column
-  doc
-    .fontSize(10)
-    .font('Helvetica')
-    .text(`Forwarded To: ${receiverDesignation[0].designation}`, rightX, y, { width: leftWidth, align: 'left' })
-
-
-    doc
-    .text(`Remarks: ${forwarder.remarks || 'N/A'}`, rightX, y+10, { width: leftWidth, align: 'left' })// Increased spacing here
-    .moveDown(2);
-
-};
-
-
-    doc.end();
-
-    // Wait for the file to be written
-    writeStream.on('finish', () => {
-      res.download(filePath, 'file_details.pdf', (err) => {
-        if (err) {
-          console.error('Error downloading PDF:', err);
-          res.status(500).send('Error downloading PDF');
-        }
-        fs.unlinkSync(filePath); // Clean up after sending
-      });
-    });
-
-    writeStream.on('error', (err) => {
-      console.error('File write error:', err);
-      res.status(500).send('Error generating PDF');
-    });
-  } catch (error) {
-    console.error('Error generating PDF:', error);
-    res.status(500).json({ error: 'Error generating PDF' });
-  }
 };

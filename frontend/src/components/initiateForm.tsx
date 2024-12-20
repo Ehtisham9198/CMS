@@ -15,7 +15,7 @@ import {
 
 const defaultData = {
   remarks: "",
-  to_users: "",
+  to_user: "",
 };
 
 const CreatedFiles = () => {
@@ -28,7 +28,6 @@ const CreatedFiles = () => {
   const file_id = useSearchParams()[0].get("file_id");
   const navigate = useNavigate();
 
-  console.log({ file, file_id, designations });
 
   function handleChange(e: React.ChangeEvent<any>) {
     setData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -46,7 +45,7 @@ const CreatedFiles = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!file_id || !data.to_users) {
+    if (!file_id || !data.to_user) {
       setError("All fields must be filled before forwarding.");
       return;
     }
@@ -58,7 +57,7 @@ const CreatedFiles = () => {
         body: JSON.stringify({
           file_id: file_id,
           action: "Send",
-          to_users: data.to_users,
+          to_user: data.to_user,
           remarks: data.remarks,
         }),
         credentials: "include",
@@ -108,7 +107,7 @@ const CreatedFiles = () => {
             Send to<span className="text-red-500">*</span>
           </label>
 
-          <Select onValueChange={(val) => setData(prev => ({...prev, to_users: val}))} value={data.to_users}>
+          <Select onValueChange={(val) => setData(prev => ({...prev, to_user: val}))} value={data.to_user}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Designation" />
             </SelectTrigger>

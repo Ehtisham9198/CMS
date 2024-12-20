@@ -6,7 +6,7 @@ const SALT_ROUNDS = 10;
 
 // For creating user
 export const createUser = tryCatch(async (req, res) => {
-    const { username, name, email, password, designation } = req.body;
+    const { username, name, email, password, designations } = req.body;
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
     if(!username || !password) {
@@ -16,16 +16,22 @@ export const createUser = tryCatch(async (req, res) => {
         });
     }
 
-    const result = await db`
-        INSERT INTO users (username, name, email, password, designation)
-        VALUES (${username}, ${name}, ${email}, ${hashedPassword}, ${designation})
+    const result1 = await db`
+        INSERT INTO users (username, name, email, password)
+        VALUES (${username}, ${name}, ${email}, ${hashedPassword})
         RETURNING *
     `;
+    
+    const result2 = await Promise.all(
+        designations.map((id: number) => db`
+            INSERT INTO dtu(id, username)
+            VALUES (${id}, ${username});`
+        )
+    );
 
     res.json({
         success: true,
         message: 'user added successfully',
-        fileData: result[0]
     });
 });
 
@@ -69,7 +75,7 @@ export const changedPassward = tryCatch(async (req, res) => {
 
 
 export const getAllDesignations = tryCatch(async (req, res) => {
-    const designations = await db`SELECT DISTINCT designation FROM users`;
+    const designations = await db`SELECT DISTINCT designation_name AS designation FROM designations `;
 
     res.json({
         success: true,
