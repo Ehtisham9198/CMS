@@ -39,10 +39,6 @@ const router = createBrowserRouter([
         element: <Link to="/dashboard">Dashboard</Link>,
       },
       {
-        path: "/action",
-        element: <Action/>,
-      },
-      {
         path: "/",
         element: (
           <Sidebar />
@@ -51,6 +47,10 @@ const router = createBrowserRouter([
           {
             path: "/dashboard",
             element: <Dashboard />,
+          },
+          {
+            path: "/dashboard/action/:file_id",
+            element: <Action />,
           },
           {
             path: "/track",

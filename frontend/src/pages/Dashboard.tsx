@@ -61,7 +61,6 @@ function Dashboard() {
     navigate(`/action`, { state: { id } });
   };
 
-
   const EditHandler = (id: string, uploadedBy: string) => {
     if (username === uploadedBy) {
       navigate("/files/create?file_id=" + id);
@@ -113,8 +112,10 @@ function Dashboard() {
                           View
                         </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => actionHandler(file.id)}>
-                        Take Action
+                      <DropdownMenuItem asChild>
+                        <Link to={"/dashboard/action/" + file.id}>
+                          Take Action
+                        </Link>
                       </DropdownMenuItem>
                       {username === file.uploaded_by && (
                         <DropdownMenuItem
@@ -125,10 +126,8 @@ function Dashboard() {
                       )}
 
                       <DropdownMenuItem>
-                         <FileDetails fileId = {file.id}/>
+                        <FileDetails fileId={file.id} />
                       </DropdownMenuItem>
-                      
-
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>

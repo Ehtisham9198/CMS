@@ -99,7 +99,7 @@ const CreatedFiles = () => {
       </Card>
 
       <form
-        className="p-2 lg:p-4 border rounded lg:rounded-lg shadow-sm gap-4 grid sm:grid-cols-2 max-w-2xl"
+        className="p-2 sm:p-4 border rounded lg:rounded-lg shadow-sm gap-4 grid sm:grid-cols-2 max-w-2xl"
         onSubmit={handleSubmit}
       >
         <div className="space-y-1">

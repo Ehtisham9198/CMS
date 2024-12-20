@@ -1,64 +1,78 @@
-import React, { useState} from "react";
-import { useLocation } from "react-router-dom";
+import { getAllDesignations, getFile, SERVER_URL } from "@/hooks/requests";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Textarea } from "./ui/textarea";
+import { Button } from "./ui/button";
+import { IFile } from "@/pages/Dashboard";
 
-interface LocationState {
-    id: string;
-  }
-
+const defaultData = {
+  remarks: "",
+  to_users: "",
+  action: "",
+};
 
 const Action = () => {
-  const [action, setAction] = useState<string>("");
-  const [id, setId] = useState<string>("");
-  const [forwardTo, setForwardTo] = useState<string>("");
-  const [error, setError] = useState<string | null>(null);
-  const [remarks, setRemarks] = useState<string>("");
-  const [successMessage, setSuccessMessage] = useState<string>("");
+  const [designations, setDesignations] = useState<any[]>([]);
+  const [file, setFile] = useState<IFile | null>();
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState(defaultData);
+  const [error, setError] = useState("");
 
-  const location = useLocation();
-  const state = location.state as LocationState; 
-  const fileId = state?.id;
+  const { file_id } = useParams();
+  const navigate = useNavigate();
 
-
-  const ForwardFileHandler = async (e: React.FormEvent<HTMLFormElement>) => {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    if (!fileId || !action || (!forwardTo && action === "forward")) {
-      console.log("All fields must be filled", fileId, action, forwardTo);
+    if (!file_id || !data.action || (!data.to_users && data.action === "forward")) {
+      console.log("All fields must be filled", file_id, data.action, data.to_users);
       setError("All fields must be filled before forwarding.");
       return;
     }
-    
+
+    setLoading(true);
     try {
-      const response = await fetch("http://localhost:3000/api/file_forward", {
+      const response = await fetch(SERVER_URL + "/api/file_forward", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          file_id: fileId,
-          action: action,
-          to_users: forwardTo,
-          remarks: remarks,
+          file_id,
+          action: data.action,
+          to_users: data.to_users,
+          remarks: data.remarks,
         }),
         credentials: "include",
       });
-      const data = await response.json();
-      console.log(data,"error")
+      const result = await response.json();
+      console.log(result,"error")
 
       if (response.ok) {
-        setError(null); 
-        setSuccessMessage("File forwarded successfully!");
+        setError("");
+        navigate("/file/"+file_id)
       } else {
-        setError(data.error || "Failed to forward file.");
-        setSuccessMessage("");
+        setError(result.error || "Failed to forward file.");
       }
     } catch (error) {
       setError("Error forwarding file. Please try again later.");
-      setSuccessMessage("");
     }
+    setLoading(false);
   };
 
+  useEffect(() => {
+    if (!file_id) {
+      return;
+    }
+
+    getFile(file_id).then(setFile);
+    getAllDesignations().then(setDesignations);
+  }, [file_id]);
+
   return (
+<<<<<<< HEAD
     <div>
        <br />
         <label htmlFor="remarks">Remarks</label> <br />
@@ -84,39 +98,100 @@ const Action = () => {
           <option value="reject">Reject</option>
           <option value="complete">Complete</option>
         </select>
+=======
+    <div className="p-2 sm:p-4 space-y-4">
+      <h1 className="text-3xl sm:text-4xl sm:mb-4">Send File</h1>
+      {error && <p className="text-destructive">{error}</p>}
+>>>>>>> b0e8f338d00cbd9ec80b6b99549de5a6545bed7e
 
-        <br />
-        <label htmlFor="forward">Forward to</label>
-        <br />
-        <select
-          name="forward"
-          id="forward"
-          className="border p-2"
-          value={forwardTo}
-          onChange={(e) => setForwardTo(e.target.value)}
-        >
-          <option value="">Select Receiver</option>
-          <option value="Dean A">Dean A</option>
-          <option value="Dean SA">Dean SA</option>
-          <option value="HoD CSE">HoD CSE</option>
-          <option value="HoD ETC">HoD ETC</option>
-          <option value="HoD EEE">HoD EEE</option>
-          <option value="Registrar">Registrar</option>
-          <option value="Director">Director</option>
-          <option value="Director">Convenor PEC</option>
+      <Card className="max-w-2xl">
+        <CardHeader>
+          <CardTitle>
+            <span className="text-muted-foreground">{file?.id} </span>
+            <span className="capitalize">{file?.title}</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>{file?.content}</p>
+        </CardContent>
+      </Card>
 
-        </select>
+      <form
+        className="p-2 sm:p-4 border rounded lg:rounded-lg shadow-sm gap-4 grid sm:grid-cols-2 max-w-2xl"
+        onSubmit={handleSubmit}
+      >
+        <div className="space-y-1">
+          <label htmlFor="content">
+            Action Type<span className="text-red-500">*</span>
+          </label>
 
-        <br />
-        <br />
-        <button
-          className="px-2 py-1 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
-        >
-          Forward
-        </button>
-        <div className="popup success">
-          <p>{successMessage}</p>
+          <Select
+            onValueChange={(val) =>
+              setData((prev) => ({ ...prev, action: val }))
+            }
+            value={data.action}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Designation" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem className="text-blue-500 focus:bg-blue-500 focus:text-blue-50" value="forward">
+                Forward
+              </SelectItem>
+              <SelectItem className="text-destructive focus:bg-destructive focus:text-destructive-foreground" value="reject">
+                Reject
+              </SelectItem>
+              <SelectItem className="text-green-500 focus:bg-green-500 focus:text-green-50" value="complete">
+                Complete
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </div>
+
+        {data.action === "forward" && (
+          <div className="space-y-1">
+          <label htmlFor="content">
+            Forward to<span className="text-red-500">*</span>
+          </label>
+
+          <Select
+            onValueChange={(val) =>
+              setData((prev) => ({ ...prev, to_users: val }))
+            }
+            value={data.to_users}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Designation" />
+            </SelectTrigger>
+            <SelectContent>
+              {designations.map(({ designation }) => (
+                <SelectItem key={designation} value={designation}>
+                  {designation.toUpperCase()}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        )}
+
+        <div className="sm:col-span-2 space-y-1">
+          <label htmlFor="remarks">
+            Remarks<span className="text-red-500">*</span>
+          </label>
+          <Textarea
+            id="remarks"
+            name="remarks"
+            placeholder="remarks..."
+            required
+            value={data.remarks}
+            onChange={(e) => setData(p => ({...p, remarks: e.target.value}))}
+          />
+        </div>
+
+        <Button className="sm:col-span-2" disabled={loading}>
+          {loading ? "Pending..." : "Submit"}
+        </Button>
+
       </form>
     </div>
   );
