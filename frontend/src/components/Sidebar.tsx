@@ -73,7 +73,7 @@ export default function Sidebar() {
 
         {/* DASHBOARD */}
         {/* <h5 className="hidden lg:block text-lg p-2 font-bold">Dashboard</h5> */}
-        <ul className="grid grid-cols-4 lg:flex lg:flex-col gap-1 p-2 lg:py-0 w-full lg:w-auto justify-around border lg:border-none">
+        <ul className="grid grid-cols-4 lg:flex lg:flex-col gap-1 lg:px-2 w-full lg:w-auto justify-around border lg:border-none">
           <SidebarLink href="/dashboard">
             <RiDashboardFill size={20} />
             <span className="text-xs lg:text-base">Dashboard</span>
@@ -109,7 +109,7 @@ const SidebarLink = ({
     <NavLink
       className={({ isActive }) =>
         [
-          "flex font-semibold lg:flex-row lg:p-2 lg:border flex-col lg:gap-2 items-center lg:px-5 lg:py-3 rounded ",
+          "flex font-semibold lg:flex-row p-2 lg:border flex-col lg:gap-2 items-center lg:px-5 lg:py-3 rounded ",
           isActive
             ? "text-primary border-primary bg-primary/5"
             : "text-primary/60",

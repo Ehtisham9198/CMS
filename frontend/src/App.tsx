@@ -53,6 +53,10 @@ const router = createBrowserRouter([
             element: <Dashboard />,
           },
           {
+            path: "/dashboard/action/:file_id",
+            element: <Action />,
+          },
+          {
             path: "/track",
             element: <TrackMyFilesPage />,
           },
