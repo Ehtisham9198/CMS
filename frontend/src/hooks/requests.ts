@@ -60,6 +60,20 @@ export const getFiles = async (): Promise<IFile[]> => {
     }
 };
 
+export const TrackMyFiles = async (): Promise<IFile[]> => {
+    try {
+        const response = await fetch(SERVER_URL + "/api/trackMyFile", {
+            credentials: "include",
+        });
+        const data = await response.json();
+
+        return data.fileData as IFile[]
+    } catch (error) {
+        console.error("Error fetching files:", error);
+        return []
+    }
+};
+
 export const getFile = async (file_id: string): Promise<IFile | null> => {
     try {
         const response = await fetch(SERVER_URL + "/api/file/" + file_id, {

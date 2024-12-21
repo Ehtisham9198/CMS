@@ -29,6 +29,7 @@ export interface IFile {
   uploaded_by: string;
   created_at: string;
   status: string;
+  forwarded_by: string;
 }
 
 function Dashboard() {
@@ -57,9 +58,6 @@ function Dashboard() {
     })();
   }, [session?.user?.designation]);
 
-  const actionHandler = (id: string) => {
-    navigate(`/action`, { state: { id } });
-  };
 
   const EditHandler = (id: string, uploadedBy: string) => {
     if (username === uploadedBy) {

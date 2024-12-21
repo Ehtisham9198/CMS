@@ -217,3 +217,51 @@ export const getfileById = async (req: Request, res: Response):Promise<any> => {
       res.status(500).json({ error: "Error in fetching files" }); 
     }
 };
+
+
+export const getTrackedMyFile = async(req:Request,res:Response):Promise<any>=>{
+  try{
+    let user;
+    if(req.session)
+    {
+      user = req.session.user.designation;
+    }
+
+    const myFiles = await db`
+      SELECT 
+        files.id AS id, 
+        files.title AS title, 
+        (
+          SELECT designation 
+          FROM paths 
+          WHERE file_id = files.id 
+          ORDER BY created_at DESC 
+          LIMIT 1 
+          OFFSET 1
+        ) AS forwarded_by, 
+        files.uploaded_by AS uploaded_by, 
+        files.created_at AS created_at, 
+        actions.action AS status
+      FROM 
+        files
+      JOIN 
+        actions ON actions.file_id = files.id
+      WHERE 
+        actions.id = (
+          SELECT MAX(a.id)
+          FROM actions a 
+          WHERE a.file_id = files.id AND a.from_user = ${user}
+        );
+    `;
+
+    res.json({
+      message : 'fetched successfully',
+      fileData : myFiles
+    });
+  }
+  catch(error)
+  {
+    console.log("Error in fetching file", error)
+    res.status(500).json({ error: "Error in fetching file"});
+  }
+}
