@@ -13,11 +13,8 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(cors({
-    credentials: true,
-    origin: [
-        "http://localhost:5173", // Local development frontend
-        "https://flowx2.vercel.app/" // Deployed frontend
-    ]
+    credentials:true,
+    origin:"https://flowx2.vercel.app/"
 }));
 
 //adding cookies
