@@ -23,6 +23,7 @@ function CreateFilePage() {
   const [file, setFile] = useState<IFile | null>();
 
   const navigate = useNavigate();
+  setSearchParams()
 
   function validFileId(title?: string): string | undefined {
     if (!title) {

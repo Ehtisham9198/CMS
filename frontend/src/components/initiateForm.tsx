@@ -44,6 +44,7 @@ const CreatedFiles = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
 
     if (!file_id || !data.to_user) {
       setError("All fields must be filled before forwarding.");
@@ -75,6 +76,7 @@ const CreatedFiles = () => {
       console.log(error);
       setError("Error forwarding file. Please try again.");
     }
+    setLoading(false)
   };
 
   if (!file_id) {

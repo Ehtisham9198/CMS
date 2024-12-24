@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 import {
   Table,
@@ -28,9 +27,7 @@ import { IFile } from "./Dashboard";
 function TrackMyFilesPage() {
   const [files, setFiles] = useState<IFile[]>([]);
   const [filter, setFilter] = useState<string>("");
-  const navigate = useNavigate();
   const session = useSession();
-  const username = session?.user?.username;
 
   const filteredList = useMemo(() => {
     const q = filter.toLowerCase();

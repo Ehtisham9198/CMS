@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -20,6 +20,9 @@ function MyDrafts() {
   const [error, setError] = useState<string | null>(null);
 
   const session = useSession();
+  if(error){
+    console.log("eor")
+  }
 
   useEffect(() => {
     const getFiles = async () => {

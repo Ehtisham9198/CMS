@@ -1,6 +1,6 @@
 import { SERVER_URL } from '@/hooks/requests';
-import React, { useState } from 'react';
-import { useLocation, useParams } from "react-router-dom";
+import { useState } from 'react';
+
 
 const FileDetails = ({fileId}: {fileId: string}) => {
 

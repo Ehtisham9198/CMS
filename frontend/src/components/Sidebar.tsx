@@ -3,7 +3,6 @@ import { RiDashboardFill } from "react-icons/ri";
 import { GoFileDirectoryFill } from "react-icons/go";
 import { SiQuicklook } from "react-icons/si";
 import { NavLink, Outlet } from "react-router-dom";
-import { IoIosPeople } from "react-icons/io";
 import { sessionContext } from "../context/Session";
 import {
   DropdownMenu,
