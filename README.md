@@ -1,9 +1,9 @@
-### **README: College File Movement System**  
+### **README: CampusFlow**  
 
 ---
 
 ### **Project Overview**  
-The College File Movement System is a digital platform designed to streamline file management and movement across various departments within a college. It replaces traditional physical file handling with an efficient, secure, and trackable digital workflow, improving overall operational efficiency.  
+The CampusFlow is a digital platform designed to streamline file management and movement across various departments within a campus. It replaces traditional physical file handling with an efficient, secure, and trackable digital workflow, improving overall operational efficiency.  
 
 ---
 
@@ -20,7 +20,8 @@ The College File Movement System is a digital platform designed to streamline fi
 ### **Tech Stack**  
 - **Frontend**: React.js for dynamic, responsive user interfaces.  
 - **Backend**: Node.js and Express.js for robust server-side logic.  
-- **Database**: PostgreSQL for structured and secure data storage.  
+- **Database**: PostgreSQL for structured and secure data storage.
+- **PDF Generation**: Libraries like pdfkit for converting files and actions into PDF format.
 - **Deployment**: Hosted on a college-provided virtual machine.  
 
 ---
@@ -29,8 +30,7 @@ The College File Movement System is a digital platform designed to streamline fi
 
 1. **Clone the Repository**  
    ```bash
-   git clone https://github.com/username/college-file-movement.git
-   cd college-file-movement
+   git clone https://github.com/Ehtisham9198/CampusFlow.git
    ```
 
 2. **Install Dependencies**  
@@ -79,25 +79,5 @@ The College File Movement System is a digital platform designed to streamline fi
 
 ---
 
-### **Future Scope**  
-- Implement role-based dashboards for better personalization.  
-- Add file versioning to maintain a history of changes.  
-- Integrate analytics to track efficiency and identify bottlenecks.  
-- Develop a mobile app for seamless access.  
-
----
-
 ### **Contributing**  
-We welcome contributions to enhance the platform. Feel free to fork the repository, make changes, and raise a pull request!  
-
----
-
-### **License**  
-This project is licensed under the MIT License.  
-
----
-
-**Developed By:**  
-Md Ehtisham  
-Secretary, Tech Society  
-IIIT Bhubaneswar  
+We welcome contributions to enhance the platform. Feel free to fork the repository, make changes, and raise a pull request!   
