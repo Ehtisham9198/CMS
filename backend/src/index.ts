@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(cors({
     credentials:true,
-    origin:"https://flowx2.vercel.app/"
+    origin:"https://flowx2.vercel.app"
 }));
 
 //adding cookies
@@ -23,8 +23,8 @@ app.use(session({
     keys: ['very_secret_key'],
     maxAge: 24 * 60 * 60 * 1000, 
     httpOnly: true,
-    secure: false,  
-    sameSite: 'strict', 
+    secure: false,
+    // sameSite: 'strict', 
 }));
 
 // Routes
@@ -32,11 +32,11 @@ app.use("/api/auth", authRouter);
 app.use("/api", fileRouter);
 app.use("/api", userRouter);
 
-
 app.get('/attachments/:id', (req, res) => {
     res.sendFile(path.join(process.cwd(), "uploads", req.params.id));
 });
 
+app.use(express.static(path.join(process.cwd(), "..", "frontend", "dist")));
 app.get('*', (req, res) => {
     res.sendFile(path.join(process.cwd(), "..", "frontend", "dist", "index.html"));
 });
