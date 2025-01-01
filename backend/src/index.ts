@@ -10,18 +10,19 @@ import path from "path";
 const app = express();
 
 const PORT = process.env.PORT || 3000;
+const FRONTEND_URL = process.env.FRONTEND_URL || "https://flowx2.vercel.app";
 
 app.use(express.json());
 app.use(cors({
-    credentials:true,
-    origin:"https://flowx2.vercel.app"
+    credentials: true,
+    origin: FRONTEND_URL
 }));
 
 //adding cookies
 app.use(session({
     name: 'session',
     keys: ['very_secret_key'],
-    maxAge: 24 * 60 * 60 * 1000, 
+    maxAge: 24 * 60 * 60 * 1000,
     httpOnly: true,
     secure: false,
     // sameSite: 'strict', 
@@ -43,7 +44,7 @@ app.get('*', (req, res) => {
 
 
 async function main() {
-  // Start the server
+    // Start the server
     app.listen(PORT, () => {
         console.log(`Server is running on http://localhost:${PORT}`);
     });

@@ -19,11 +19,10 @@ interface ErrType extends IFormData {
 function CreateFilePage() {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<ErrType>();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const [file, setFile] = useState<IFile | null>();
 
   const navigate = useNavigate();
-  setSearchParams()
 
   function validFileId(title?: string): string | undefined {
     if (!title) {
@@ -79,11 +78,10 @@ function CreateFilePage() {
     if (err.id || err.content || err.title) {
       setErr(err);
       return;
-    } else {
-      setErr(undefined);
     }
 
     setLoading(true);
+    setErr({message: ""});
 
     try {
       const response = await fetch(SERVER_URL + "/api/initiate_file", {
@@ -92,10 +90,10 @@ function CreateFilePage() {
         credentials: "include",
       });
 
-      const result = await response.json();
       if (response.ok) {
         navigate("/files");
       } else {
+        const result = await response.json();
         setErr({ message: result.error || "Error initiating file" });
       }
     } catch (error) {
