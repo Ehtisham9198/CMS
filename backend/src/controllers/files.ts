@@ -88,41 +88,59 @@ export const getFile = async (req: Request, res: Response): Promise<any> => {
 };
 
 
-// for initiate new file
 export const getInitiateFiles = async (
   req: Request,
   res: Response
 ): Promise<any> => {
   try {
-    const { id, title,content} = req.body;
-    let uploaded_by;
+    const { id, title, content } = req.body;
+    let uploaded_by
     if (req.session && req.session.user) {
       uploaded_by = req.session.user.designation;
     }
-    const file = req.file;
+
+    let file = req.file;
+
+    const checkcaseResult = await db`
+      SELECT caseid
+      FROM files
+      WHERE file_id = ${id} 
+      ORDER BY created_at DESC 
+      LIMIT 1
+    `;
+    console.log(checkcaseResult,"checking case");
+    let caseNumber = 1;
+    let newFileId
+
+
+    // If there are previous records, increment the case number
+    if (checkcaseResult.length > 0) {
+      const latestCase = checkcaseResult[0].caseid;
+      newFileId = id ? `${id}/${parseInt(latestCase, 10) + 1}` : null;
+      caseNumber = parseInt(latestCase, 10) + 1;
+    }else{
+      newFileId = id+'/1'
+    }
+    // If no file is uploaded, store data without file field
 
     if (!file) {
     const result = await db`
-      INSERT INTO files (id, title, uploaded_by, content) 
-      VALUES (${id}, ${title}, ${uploaded_by}, ${content})
-    `;
-    }else{
-      const filePath =file.path;
+        INSERT INTO files (id, title, uploaded_by, content, "caseid",file_id) 
+        VALUES (${newFileId}, ${title}, ${uploaded_by}, ${content}, ${caseNumber},${id})`;
+      res.status(200).send({ message: 'File record created without upload.' });
+
+    } else {
       const result = await db`
-        INSERT INTO files (id, title, uploaded_by, content, file) 
-        VALUES (${id}, ${title}, ${uploaded_by}, ${content}, ${filePath})
+        INSERT INTO files (id, title, uploaded_by, content, file, caseid,file_id) 
+        VALUES (${newFileId}, ${title}, ${uploaded_by}, ${content}, ${id}, ${caseNumber},${id})
       `;
+      res.status(200).send({ message: 'File record created with upload.' });
     }
-
-
-    res.json({
-      message: "File initiated successfully",
-    });
   } catch (error) {
-    console.error("Error initiating file:", error);
-    res.status(500).json({ error: "Error initiating file" });
+    res.status(500).send({ message: 'Error while initiating the file.', error });
   }
 };
+
 
 
 
