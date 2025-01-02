@@ -1,0 +1,21 @@
+# Use a lightweight Node.js image
+FROM node:lts-alpine
+
+# Set the working directory
+WORKDIR /app
+
+# Copy package files and install all dependencies, including devDependencies
+COPY package.json package-lock.json ./
+RUN npm install --production=false
+
+# Copy the rest of the application code
+COPY . .
+
+# Switch to a non-root user for security
+USER node
+
+# Run the application in development mode using ts-node
+CMD ["npm", "run", "dev"]
+
+# Expose the application port
+EXPOSE 3000
