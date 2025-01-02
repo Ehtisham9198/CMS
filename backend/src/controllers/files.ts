@@ -112,14 +112,12 @@ export const getInitiateFiles = async (
     let caseNumber = 1;
     let newFileId
 
-
-    // If there are previous records, increment the case number
     if (checkcaseResult.length > 0) {
       const latestCase = checkcaseResult[0].caseid;
-      newFileId = id ? `${id}/${parseInt(latestCase, 10) + 1}` : null;
+      newFileId = id ? `${id}_${parseInt(latestCase, 10) + 1}` : null;
       caseNumber = parseInt(latestCase, 10) + 1;
     }else{
-      newFileId = id+'/1'
+      newFileId = id+'_1'
     }
     // If no file is uploaded, store data without file field
 
