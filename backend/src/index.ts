@@ -10,7 +10,7 @@ import path from "path";
 const app = express();
 
 const PORT = process.env.PORT || 3000;
-const FRONTEND_URL = process.env.FRONTEND_URL || "https://flowx2.vercel.app";
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 
 app.use(express.json());
 app.use(cors({
