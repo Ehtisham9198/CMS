@@ -34,27 +34,17 @@ const Action = () => {
     }
 
     const formData = new FormData(e.currentTarget);
-
     formData.append('file_id', file_id);
 
-    console.log(Object.fromEntries(formData.entries()));
-    return;
-
     setLoading(true);
+
     try {
       const response = await fetch(SERVER_URL + "/api/file_forward", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          file_id,
-          action: data.action,
-          to_user: data.to_user,
-          remarks: data.remarks,
-        }),
+        body: formData,
         credentials: "include",
       });
+
       const result = await response.json();
       console.log(result,"error")
 
