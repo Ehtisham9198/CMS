@@ -13,6 +13,8 @@ export const sessionContext = createContext<{
   revalidate: () => Promise<void>;
 }>({ session: null, revalidate: async () => {} });
 
+
+
 export const useSession = () => useContext(sessionContext).session;
 
 function SessionProvider({ children }: { children: React.JSX.Element }) {

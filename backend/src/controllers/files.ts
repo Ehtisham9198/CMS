@@ -1,7 +1,8 @@
 import db from "../configurations/db";
 import { Request, Response } from "express";
-
-
+import path from "path";
+import fs from "fs";
+import { v4 as uuidv4 } from "uuid";
 
 //  track files
 export const getTrack = async (req: Request, res: Response): Promise<any> => {
@@ -34,9 +35,6 @@ export const getTrack = async (req: Request, res: Response): Promise<any> => {
   }
 };
 
-
-
-
 // get files for logged in user
 export const getFiles = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -61,16 +59,13 @@ export const getFiles = async (req: Request, res: Response): Promise<any> => {
   }
 };
 
-
-
-
 // get file by id
 export const getFile = async (req: Request, res: Response): Promise<any> => {
   try {
     const file_id = req.params.id as string;
     const [file] = await db`SELECT* FROM files WHERE id = ${file_id}`;
 
-    if(!file){
+    if (!file) {
       return res.status(404).json({
         success: false,
         error: "file not found.",
@@ -87,19 +82,27 @@ export const getFile = async (req: Request, res: Response): Promise<any> => {
   }
 };
 
-
 export const getInitiateFiles = async (
   req: Request,
   res: Response
 ): Promise<any> => {
   try {
     const { id, title, content } = req.body;
-    let uploaded_by
+    let uploaded_by;
     if (req.session && req.session.user) {
       uploaded_by = req.session.user.designation;
     }
 
     let file = req.file;
+    let newPath = null;
+    if (file) {
+      console.log(file);
+      const ext = file.originalname.split(".").pop();
+      const newName = `${uploaded_by}-${uuidv4()}.${ext}`;
+      newPath = path.join(file.destination, newName);
+      fs.renameSync(file.path, newPath);
+      console.log(newPath);
+    }
 
     const checkcaseResult = await db`
       SELECT caseid
@@ -108,40 +111,36 @@ export const getInitiateFiles = async (
       ORDER BY created_at DESC 
       LIMIT 1
     `;
-    console.log(checkcaseResult,"checking case");
+    console.log(checkcaseResult, "checking case");
     let caseNumber = 1;
-    let newFileId
+    let newFileId;
 
     if (checkcaseResult.length > 0) {
       const latestCase = checkcaseResult[0].caseid;
       newFileId = id ? `${id}_${parseInt(latestCase, 10) + 1}` : null;
       caseNumber = parseInt(latestCase, 10) + 1;
-    }else{
-      newFileId = id+'_1'
+    } else {
+      newFileId = id + "_1";
     }
-    // If no file is uploaded, store data without file field
 
     if (!file) {
-    const result = await db`
+      const result = await db`
         INSERT INTO files (id, title, uploaded_by, content, "caseid",file_id) 
         VALUES (${newFileId}, ${title}, ${uploaded_by}, ${content}, ${caseNumber},${id})`;
-      res.status(200).send({ message: 'File record created without upload.' });
-
+      res.status(200).send({ message: "File record created without upload." });
     } else {
       const result = await db`
-        INSERT INTO files (id, title, uploaded_by, content, file, caseid,file_id) 
-        VALUES (${newFileId}, ${title}, ${uploaded_by}, ${content}, ${id}, ${caseNumber},${id})
+        INSERT INTO files (id, title, uploaded_by, content, upload, caseid,file_id) 
+        VALUES (${newFileId}, ${title}, ${uploaded_by}, ${content}, ${newPath}, ${caseNumber},${id})
       `;
-      res.status(200).send({ message: 'File record created with upload.' });
+      res.status(200).send({ message: "File record created with upload." });
     }
   } catch (error) {
-    res.status(500).send({ message: 'Error while initiating the file.', error });
+    res
+      .status(500)
+      .send({ message: "Error while initiating the file.", error });
   }
 };
-
-
-
-
 
 export const getReceivedFiles = async (
   req: Request,
@@ -181,65 +180,62 @@ export const getReceivedFiles = async (
   }
 };
 
+export const getEditFile = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const { id, title, content } = req.body;
+    if (!id || !title || !content) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+    console.log(req.body);
+    await db`UPDATE files SET title = ${title},content= ${content} WHERE id=${id}`;
+    res.status(200).json({
+      message: "Editted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Error in Editing" });
+  }
+};
 
+export const getfileById = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const fileId = req.query.file_id as string;
+    if (!(req.session && req.session.user)) {
+      return res.status(401).json({ error: "Unauthorized access" });
+    }
+    const User = req.session.user.username;
 
+    if (!fileId) {
+      return res.status(400).json({ error: "File ID is required" });
+    }
 
-export const getEditFile =async(req:Request,res:Response): Promise<any>=>{
-try{
- const {id,title,content} = req.body
- if (!id || !title || !content) {
-  return res.status(400).json({ error: "All fields are required" });
-}
- console.log(req.body)
- await db `UPDATE files SET title = ${title},content= ${content} WHERE id=${id}`
- res.status(200).json({
-    message: "Editted successfully",
-})
-}catch(error)
-{
-    res.status(500).json({error: 'Error in Editing'})
-}
-}
-
-
-
-
-
-export const getfileById = async (req: Request, res: Response):Promise<any> => {
-
-    try {
-      const fileId = req.query.file_id as string;
-      if (!(req.session && req.session.user)) {
-        return res.status(401).json({ error: "Unauthorized access" });
-      }
-      const User = req.session.user.username;
-
-      if (!fileId) {
-        return res.status(400).json({ error: "File ID is required" });
-      }
-      
-      const result = await db`
+    const result = await db`
       SELECT id, title, content, created_at
       FROM files 
       WHERE uploaded_by = ${User} AND id = ${fileId}`;
-      
-  
-      res.json({
-        massage: "file is fetched",
-        fileData: result,
-      });
-    } catch (error) {
-      console.error("Error in fetching files:", error);
-      res.status(500).json({ error: "Error in fetching files" }); 
-    }
+
+    res.json({
+      massage: "file is fetched",
+      fileData: result,
+    });
+  } catch (error) {
+    console.error("Error in fetching files:", error);
+    res.status(500).json({ error: "Error in fetching files" });
+  }
 };
 
-
-export const getTrackedMyFile = async(req:Request,res:Response):Promise<any>=>{
-  try{
+export const getTrackedMyFile = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
     let user;
-    if(req.session)
-    {
+    if (req.session) {
       user = req.session.user.designation;
     }
 
@@ -271,13 +267,11 @@ export const getTrackedMyFile = async(req:Request,res:Response):Promise<any>=>{
     `;
 
     res.json({
-      message : 'fetched successfully',
-      fileData : myFiles
+      message: "fetched successfully",
+      fileData: myFiles,
     });
+  } catch (error) {
+    console.log("Error in fetching file", error);
+    res.status(500).json({ error: "Error in fetching file" });
   }
-  catch(error)
-  {
-    console.log("Error in fetching file", error)
-    res.status(500).json({ error: "Error in fetching file"});
-  }
-}
+};
