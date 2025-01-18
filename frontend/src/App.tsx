@@ -1,13 +1,9 @@
-import {
-  createBrowserRouter,
-  Link,
-  Outlet,
-  RouterProvider,
-} from "react-router-dom";
+import {createBrowserRouter,Outlet,RouterProvider} from "react-router-dom";
+import SessionProvider from "./context/Session.tsx";
+
 import MyDrafts from "./pages/MyDrafts.tsx";
 import Sidebar from "./components/Sidebar.tsx";
 import LoginPage from "./pages/login.tsx";
-import SessionProvider from "./context/Session.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import UsersPage from "./pages/Users.tsx";
 import SignUp from "./pages/SignUP.tsx";
@@ -16,6 +12,7 @@ import Action from "./components/action.tsx";
 import CreateFilePage from "./pages/CreateFilePage.tsx";
 import Forward from "./components/initiateForm.tsx"
 import TrackMyFilesPage from "./pages/TrackMyFilesPage.tsx";
+import WelcomePage from "./pages/WelcomePage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -36,7 +33,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/",
-        element: <Link to="/dashboard">Dashboard</Link>,
+        element: <WelcomePage/>
       },
       {
         path: "/",
