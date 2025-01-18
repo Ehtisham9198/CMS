@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
 import { IFile } from "@/pages/Dashboard";
+import { Input } from "./ui/input";
 
 const defaultData = {
   remarks: "",
@@ -31,6 +32,13 @@ const Action = () => {
       setError("All fields must be filled before forwarding.");
       return;
     }
+
+    const formData = new FormData(e.currentTarget);
+
+    formData.append('file_id', file_id);
+
+    console.log(Object.fromEntries(formData.entries()));
+    return;
 
     setLoading(true);
     try {
@@ -102,6 +110,7 @@ const Action = () => {
               setData((prev) => ({ ...prev, action: val }))
             }
             value={data.action}
+            name="action"
           >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select Action" />
@@ -131,6 +140,7 @@ const Action = () => {
               setData((prev) => ({ ...prev, to_user: val }))
             }
             value={data.to_user}
+            name="to_user"
           >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Designation" />
@@ -158,6 +168,11 @@ const Action = () => {
             value={data.remarks}
             onChange={(e) => setData(p => ({...p, remarks: e.target.value}))}
           />
+        </div>
+
+        <div className="space-y-1">
+          <label htmlFor="file">Attachments</label>
+          <Input type="file" multiple name="file" />
         </div>
 
         <Button className="sm:col-span-2" disabled={loading}>

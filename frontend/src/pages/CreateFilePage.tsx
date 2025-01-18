@@ -60,7 +60,7 @@ function CreateFilePage() {
 
     const formData = new FormData(e.currentTarget);
 
-    if(file?.id) {
+    if (file?.id) {
       formData.append("id", file.id);
     }
     err.id = validFileId(formData.get("id")?.toString());
@@ -81,7 +81,7 @@ function CreateFilePage() {
     }
 
     setLoading(true);
-    setErr({message: ""});
+    setErr({ message: "" });
 
     try {
       const response = await fetch(SERVER_URL + "/api/initiate_file", {
@@ -120,21 +120,22 @@ function CreateFilePage() {
         className="p-2 gap-4 grid sm:grid-cols-2 max-w-2xl"
         onSubmit={handleSubmit}
       >
-          <div className="space-y-1">
-            <label htmlFor="id">
-              File ID<span className="text-red-500">*</span>
-            </label>
-            <Input
-              onBlur={handleIdBlur}
-              id="id"
-              name="id"
-              placeholder="file id..."
-              required
-              disabled={!!file?.id}
-              defaultValue={file?.id}
-            />
-            {err?.id && <p className="text-destructive">{err.id}</p>}
-          </div>
+        <div className="space-y-1">
+          <label htmlFor="id">
+            File ID<span className="text-red-500">*</span>
+          </label>
+          <Input
+            onBlur={handleIdBlur}
+            id="id"
+            name="id"
+            placeholder="file id..."
+            required
+            disabled={!!file?.id}
+            defaultValue={file?.id}
+          />
+          {err?.id && <p className="text-destructive">{err.id}</p>}
+        </div>
+
         <div className="space-y-1">
           <label htmlFor="title">
             Title<span className="text-red-500">*</span>
@@ -142,12 +143,13 @@ function CreateFilePage() {
           <Input
             id="title"
             name="title"
-            placeholder="file id..."
+            placeholder="file title..."
             required
             defaultValue={file?.title}
           />
           {err?.title && <p className="text-destructive">{err.title}</p>}
         </div>
+
         <div className="sm:col-span-2 space-y-1">
           <label htmlFor="content">
             Content<span className="text-red-500">*</span>
