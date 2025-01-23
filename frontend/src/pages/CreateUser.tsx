@@ -1,3 +1,4 @@
+import { SERVER_URL } from '@/hooks/requests';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -53,7 +54,7 @@ const CreateUser = () => {
 
   const logout = async () => {
     try {
-      await fetch('http://localhost:3000/api/logout', {
+      await fetch(SERVER_URL + '/api/logout', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,3 +1,4 @@
+import { SERVER_URL } from "@/hooks/requests";
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -32,7 +33,7 @@ const CreatedFiles = () => {
       if (!id) return;
 
       try {
-        const response = await fetch(`http://localhost:3000/api/fileById?file_id=${id}`, {
+        const response = await fetch( SERVER_URL + `/api/fileById?file_id=${id}`, {
           credentials: "include",
         });
         const data = await response.json();
@@ -60,7 +61,7 @@ const CreatedFiles = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/api/file_forward", {
+      const response = await fetch(SERVER_URL + "/api/file_forward", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

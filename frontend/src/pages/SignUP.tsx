@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { SERVER_URL } from '@/hooks/requests';
 
 const SignUp=()=>{
   const [formData, setFormData] = useState({
@@ -6,11 +7,11 @@ const SignUp=()=>{
     name: '',
     email: '',
     password: '',
-    designation: ''
+    designation: '',
+    isAdmin:false,
   });
 
   const [message, setMessage] = useState('');
-
   const handleChange = (e:any) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -18,17 +19,17 @@ const SignUp=()=>{
   const handleSubmit = async (e:any) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:3000/api/CreateUser', {
+      const response = await fetch(SERVER_URL + '/api/CreateUser', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)
       });
-
+      console.log(formData)
       const data = await response.json();
       setMessage(data.message);
-      setFormData({ username: '', name: '', email: '', password: '', designation: '' });
+      setFormData({ username: '', name: '', email: '', password: '', designation: '' ,isAdmin:false});
     } catch (error) {
       setMessage('Error in creating user');
       console.error('Error:', error);
@@ -99,7 +100,13 @@ const SignUp=()=>{
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" 
             />
           </div>
-
+          <div>
+          <label htmlFor="" className='text-gray-600 px-2'>are you admin?</label>
+          <input type="checkbox"
+           checked={formData.isAdmin} 
+           onChange={(e) => setFormData({ ...formData, isAdmin: e.target.checked })} 
+          />
+          </div>
           <button type="submit" className="w-full bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400">Create User</button>
         </form>
         {message && <p className="mt-4 text-center text-green-600 font-semibold">{message}</p>}
